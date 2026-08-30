@@ -1,0 +1,126 @@
+"""Streamlit frontend application."""
+
+import streamlit as st
+import httpx
+import json
+
+API_BASE = "http://localhost:8000"
+
+
+st.set_page_config(page_title="MCI-v2.0", page_icon="🎬", layout="wide")
+
+st.title("MCI-v2.0: Media Content Intelligence")
+
+
+def search_clips(query: str, max_results: int = 10):
+    """Search for clips."""
+    try:
+        response = httpx.post(
+            f"{API_BASE}/search",
+            json={"query": query, "max_results": max_results},
+            timeout=30.0,
+        )
+        return response.json()
+    except Exception as e:
+        st.error(f"Search failed: {e}")
+        return None
+
+
+with st.sidebar:
+    st.header("Search Settings")
+    max_results = st.slider("Max Results", 1, 50, 10)
+
+    st.divider()
+    st.header("Example Queries")
+    examples = [
+        "Find 30-second clips where Messi is drinking from a Pepsi bottle",
+        "Search for goals with Adidas logo visible",
+        "Find clips cleared for Germany digital highlights",
+    ]
+    for ex in examples:
+        if st.button(ex, key=ex):
+            st.session_state.query = ex
+
+
+if "query" not in st.session_state:
+    st.session_state.query = ""
+
+
+query = st.text_input(
+    "Enter your search query:",
+    value=st.session_state.query,
+    placeholder="e.g., Find clips where Messi drinks from a Pepsi bottle",
+)
+
+
+if st.button("Search", type="primary"):
+    if query:
+        with st.spinner("Searching..."):
+            result = search_clips(query, max_results)
+
+            if result:
+                st.session_state.last_result = result
+                st.session_state.query = query
+
+
+if "last_result" in st.session_state:
+    result = st.session_state.last_result
+
+    st.divider()
+    st.subheader(f"Results for: {result.get('query', '')}")
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Found", result.get("total_found", 0))
+    with col2:
+        st.metric("Processing Time", f"{result.get('processing_time_ms', 0):.0f}ms")
+    with col3:
+        review_required = result.get("human_review_required", False)
+        st.metric("Human Review", "Required" if review_required else "Not Required")
+
+    st.subheader("Candidate Clips")
+
+    for i, clip in enumerate(result.get("candidate_clips", []), 1):
+        with st.expander(f"Clip {i}: {clip.get('clip_id', 'unknown')}"):
+            col1, col2 = st.columns(2)
+            with col1:
+                st.write(f"**Video ID:** {clip.get('video_id', 'N/A')}")
+                st.write(f"**Score:** {clip.get('score', 0):.3f}")
+            with col2:
+                st.write(f"**Time:** {clip.get('start_time', 0):.1f}s - {clip.get('end_time', 0):.1f}s")
+
+            st.write(f"**Relevance:** {clip.get('relevance_reason', 'N/A')}")
+
+            if clip.get("evidence"):
+                with st.expander("Evidence Details"):
+                    st.json(clip.get("evidence", {}))
+
+    st.divider()
+
+    st.subheader("Feedback")
+    col1, col2 = st.columns(2)
+    with col1:
+        feedback_clip = st.selectbox(
+            "Select clip to feedback",
+            [c.get("clip_id", "") for c in result.get("candidate_clips", [])],
+        )
+    with col2:
+        feedback_type = st.radio("Feedback", ["thumbs_up", "thumbs_down"])
+
+    if st.button("Submit Feedback"):
+        try:
+            httpx.post(
+                f"{API_BASE}/feedback",
+                json={
+                    "query": query,
+                    "clip_id": feedback_clip,
+                    "feedback": feedback_type,
+                },
+            )
+            st.success("Feedback submitted!")
+        except Exception as e:
+            st.error(f"Feedback failed: {e}")
+
+
+st.divider()
+st.caption("MCI-v2.0 Media Content Intelligence Platform")

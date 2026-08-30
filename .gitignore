@@ -1,0 +1,121 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+download/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+
+# Datasets and generated media (never publish)
+data/**
+dataset/
+datasets/
+evaluation/golden_dataset.json
+evaluation/generated/
+*.csv
+*.tsv
+*.jsonl
+*.parquet
+*.arrow
+*.feather
+*.avro
+*.mp4
+*.webm
+*.mkv
+*.avi
+*.mov
+*.wav
+*.mp3
+*.flac
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+
+# Pretrained models, checkpoints, features, and experiment artifacts
+model/
+models/
+pretrained/
+pretrained_models/
+checkpoints/
+weights/
+embeddings/
+runs/
+wandb/
+mlruns/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.pb
+*.tflite
+*.mlmodel
+*.h5
+*.keras
+*.joblib
+*.pkl
+*.pickle
+*.npy
+*.npz
+*.faiss
+*.index
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Docker
+*.pid
+
+# Prometheus
+prometheus_data/
