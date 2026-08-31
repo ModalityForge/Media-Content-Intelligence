@@ -7,7 +7,7 @@ from typing import Any
 from agents.state import MCIState
 from agents.evidence_validator import EvidenceValidatorAgent
 from agents.a2a_protocol import send_task
-from services.query_rewriter import rewrite_query
+from services.query_rewriter import extract_filters, rewrite_query
 from services.hyde_generator import generate_hyde
 from tools.mcp_registry import get_registry
 from observability.logger import get_logger
@@ -34,14 +34,14 @@ class MediaOrchestratorAgent:
             "territory": None,
             "usage_type": "digital_highlights",
             "duration": None,
-            "filters": {},
+            "filters": extract_filters(query),
         }
 
         talents = re.findall(r"\b(Messi|Ronaldo|LeBron|Tiger|Kobe|Beckham)\b", query, re.IGNORECASE)
         intent["talents"] = list(set(talents))
 
         required_brands = re.findall(r"\b(Adidas|Pepsi|Coca-Cola|Apple|Samsung)\b", query, re.IGNORECASE)
-        excluded_brands = re.findall(r"\bNike|Unilever|PepsiCo excluded)\b", query, re.IGNORECASE)
+        excluded_brands = re.findall(r"\b(Nike|Unilever|PepsiCo)\s+(?:excluded|not)", query, re.IGNORECASE)
 
         brand_match = re.search(r"(\w+) is (?:not|absent|excluded)", query, re.IGNORECASE)
         if brand_match:
@@ -49,6 +49,12 @@ class MediaOrchestratorAgent:
 
         intent["brands"]["required"] = list(set(required_brands))
         intent["brands"]["excluded"] = list(set(excluded_brands))
+        if intent["brands"]["required"]:
+            intent["filters"]["brands"] = intent["brands"]["required"]
+        else:
+            intent["filters"].pop("brands", None)
+        if intent["brands"]["excluded"]:
+            intent["filters"]["excluded_brands"] = intent["brands"]["excluded"]
 
         actions = re.findall(r"\b(drinking|scoring|celebrating|running|celebrating)\b", query, re.IGNORECASE)
         intent["actions"] = list(set(actions))
@@ -71,65 +77,26 @@ class MediaOrchestratorAgent:
         """Generate HyDE hypothetical document."""
         return generate_hyde(query)
 
-    def plan_tool_calls(self, parsed_intent: dict[str, Any]) -> list[dict[str, Any]]:
-        """Plan which tools to call based on intent."""
-        tool_calls = []
+    def plan_tool_calls(
+        self,
+        parsed_intent: dict[str, Any],
+        filters: dict[str, Any] | None = None,
+        top_k: int = 20,
+    ) -> list[dict[str, Any]]:
+        """Plan deterministic retrieval calls.
 
-        tool_calls.append(
-            {
-                "tool_name": "vector_search",
-                "payload": {
-                    "query": parsed_intent.get("query", ""),
-                    "top_k": 20,
-                },
-            }
-        )
-
-        tool_calls.append(
-            {
-                "tool_name": "bm25_search",
-                "payload": {
-                    "query": parsed_intent.get("query", ""),
-                    "top_k": 20,
-                },
-            }
-        )
-
-        if parsed_intent.get("talents") or parsed_intent.get("brands"):
-            tool_calls.append(
-                {
-                    "tool_name": "logo_detection",
-                    "payload": {
-                        "clip_ids": ["placeholder"],
-                        "target_brands": parsed_intent["brands"]["required"]
-                        + parsed_intent["brands"]["excluded"],
-                    },
-                }
-            )
-
-            if parsed_intent.get("talents"):
-                tool_calls.append(
-                    {
-                        "tool_name": "talent_match",
-                        "payload": {
-                            "clip_ids": ["placeholder"],
-                            "target_talents": parsed_intent["talents"],
-                        },
-                    }
-                )
-
-        if parsed_intent.get("actions"):
-            tool_calls.append(
-                {
-                    "tool_name": "action_classification",
-                    "payload": {
-                        "clip_ids": ["placeholder"],
-                        "target_actions": parsed_intent["actions"],
-                    },
-                }
-            )
-
-        return tool_calls
+        Mock vision tools are deliberately not run against placeholder clip
+        ids. Random mock detections must never influence which video is shown.
+        """
+        payload = {
+            "query": parsed_intent.get("query", ""),
+            "top_k": top_k,
+            "filters": filters or {},
+        }
+        return [
+            {"tool_name": "vector_search", "payload": dict(payload)},
+            {"tool_name": "bm25_search", "payload": dict(payload)},
+        ]
 
     def run_tool_calls(self, planned_calls: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Execute planned tool calls."""
@@ -161,7 +128,14 @@ class MediaOrchestratorAgent:
             handler=validation_handler,
         )
 
-        return result
+        if result.get("status") == "completed":
+            return result.get("output", {})
+        return {
+            "overall_passed": False,
+            "overall_confidence": 0.0,
+            "requires_human_review": True,
+            "review_reason": result.get("error", "Evidence validation failed"),
+        }
 
     def apply_guardrails(self, candidate_clips: list[dict]) -> dict[str, Any]:
         """Apply guardrails to candidate clips."""
@@ -210,7 +184,10 @@ class MediaOrchestratorAgent:
         hyde = self.generate_hyde(query)
         state.hyde_query = hyde
 
-        plan = self.plan_tool_calls(parsed_intent)
+        effective_filters = dict(parsed_intent.get("filters", {}))
+        effective_filters.update(filters or {})
+        retrieval_limit = max(max_results, 20)
+        plan = self.plan_tool_calls(parsed_intent, effective_filters, retrieval_limit)
         state.planned_tool_calls = plan
 
         tool_results = self.run_tool_calls(plan)
@@ -221,23 +198,41 @@ class MediaOrchestratorAgent:
             if "results" in tr.get("result", {}):
                 all_results.extend(tr["result"]["results"])
 
+        result_sets = [
+            tr["result"]
+            for tr in tool_results
+            if any(item.get("clip_id") for item in tr.get("result", {}).get("results", []))
+        ]
         rrf_result = self.tool_registry.run_tool(
             "rrf_fusion",
-            {"result_sets": tool_results, "k": 60},
+            {"result_sets": result_sets, "k": 60, "top_k": retrieval_limit},
         )
         fused_results = rrf_result.get("results", [])
 
-        clip_ids = [r["clip_id"] for r in fused_results[:10]]
+        clip_ids = [r["clip_id"] for r in fused_results[:retrieval_limit]]
 
         for i, clip_id in enumerate(clip_ids):
             clip_result = fused_results[i] if i < len(fused_results) else {}
             candidate = {
                 "clip_id": clip_id,
-                "video_id": f"video-{(i % 5) + 1:03d}",
-                "start_time": 30.0 * i,
-                "end_time": 30.0 * (i + 1),
+                "video_id": clip_result["video_id"],
+                "file_path": clip_result.get("file_path", ""),
+                "start_time": clip_result.get("start_time", 0.0),
+                "end_time": clip_result.get("end_time", 30.0),
                 "score": clip_result.get("score", clip_result.get("rrf_score", 0.8)),
-                "relevance_reason": f"Matched query: {query[:50]}",
+                "title": clip_result.get("title", ""),
+                "description": clip_result.get("description", ""),
+                "source": clip_result.get("source", ""),
+                "source_url": clip_result.get("source_url", ""),
+                "source_page": clip_result.get("source_page", ""),
+                "asset_name": clip_result.get("asset_name", ""),
+                "dataset": clip_result.get("dataset", ""),
+                "content_type": clip_result.get("content_type", "video"),
+                "mime_type": clip_result.get("mime_type"),
+                "annotations": clip_result.get("annotations", {}),
+                "relevance_reason": clip_result.get(
+                    "relevance_reason", f"Matched query: {query[:50]}"
+                ),
             }
             state.candidate_clips.append(candidate)
 
@@ -245,8 +240,15 @@ class MediaOrchestratorAgent:
             "clip_id": clip_ids[0] if clip_ids else "unknown",
             "query": query,
             "retrieved_evidence": {"results": fused_results},
-            "visual_evidence": {"logos": ["Adidas"], "talent_matches": parsed_intent.get("talents", [])},
-            "rights_evidence": {"rights_cleared": True, "explanation": "Rights cleared for Germany digital highlights"},
+            "visual_evidence": {
+                "logos": [],
+                "talent_matches": [],
+                "explanation": "No visual model inference was run during metadata search",
+            },
+            "rights_evidence": {
+                "rights_cleared": False,
+                "explanation": "Review the source license annotation before use",
+            },
         }
         state.evidence_bundle = evidence_bundle
 

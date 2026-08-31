@@ -1,5 +1,6 @@
 """A2A Protocol for agent communication."""
 
+import inspect
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
@@ -103,6 +104,8 @@ async def send_task(
 
     try:
         result = handler(task_payload)
+        if inspect.isawaitable(result):
+            result = await result
         return A2AResult(
             task_id=task.task_id,
             status="completed",

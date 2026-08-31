@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     metadata_db_url: str = "sqlite:///mci.db"
     redis_url: str = "redis://localhost:6379/0"
     object_store_path: str = "./data/raw"
+    social_media_store_path: str = "./data/restricted/social_media_influencer"
 
     enable_mock_models: bool = True
     enable_langfuse: bool = False

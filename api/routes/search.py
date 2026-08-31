@@ -24,7 +24,7 @@ async def search(
     start_time = time.time()
 
     trace_id = get_request_id(http_request)
-    request.state.trace_id = trace_id
+    http_request.state.trace_id = trace_id
 
     result = await orchestrator.run(
         query=request.query,
@@ -47,6 +47,17 @@ async def search(
                 end_time=c["end_time"],
                 score=c["score"],
                 relevance_reason=c["relevance_reason"],
+                title=c.get("title"),
+                file_path=c.get("file_path"),
+                description=c.get("description"),
+                source=c.get("source"),
+                source_url=c.get("source_url"),
+                source_page=c.get("source_page"),
+                asset_name=c.get("asset_name"),
+                dataset=c.get("dataset"),
+                content_type=c.get("content_type", "video"),
+                mime_type=c.get("mime_type"),
+                annotations=c.get("annotations", {}),
                 evidence=c.get("evidence", {}),
             )
             for c in result.get("candidate_clips", [])

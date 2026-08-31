@@ -20,6 +20,7 @@ def search_clips(query: str, max_results: int = 10):
             json={"query": query, "max_results": max_results},
             timeout=30.0,
         )
+        response.raise_for_status()
         return response.json()
     except Exception as e:
         st.error(f"Search failed: {e}")
@@ -29,6 +30,13 @@ def search_clips(query: str, max_results: int = 10):
 with st.sidebar:
     st.header("Search Settings")
     max_results = st.slider("Max Results", 1, 50, 10)
+
+    st.divider()
+    show_inset = st.checkbox(
+        "Show video previews (inset)",
+        value=True,
+        help="Embed a playable video preview for each relevant clip.",
+    )
 
     st.divider()
     st.header("Example Queries")
@@ -81,19 +89,48 @@ if "last_result" in st.session_state:
     st.subheader("Candidate Clips")
 
     for i, clip in enumerate(result.get("candidate_clips", []), 1):
-        with st.expander(f"Clip {i}: {clip.get('clip_id', 'unknown')}"):
+        title = clip.get("title") or clip.get("clip_id", "unknown")
+        with st.expander(f"Clip {i}: {title}"):
             col1, col2 = st.columns(2)
             with col1:
                 st.write(f"**Video ID:** {clip.get('video_id', 'N/A')}")
                 st.write(f"**Score:** {clip.get('score', 0):.3f}")
+                st.write(f"**Dataset:** {clip.get('dataset', 'N/A')}")
             with col2:
                 st.write(f"**Time:** {clip.get('start_time', 0):.1f}s - {clip.get('end_time', 0):.1f}s")
+                st.write(f"**Source:** {clip.get('source', 'N/A')}")
 
             st.write(f"**Relevance:** {clip.get('relevance_reason', 'N/A')}")
+            if clip.get("asset_name"):
+                st.write(f"**Original asset:** {clip['asset_name']}")
+
+            link_col1, link_col2 = st.columns(2)
+            with link_col1:
+                if clip.get("source_url"):
+                    st.link_button("Open exact source file", clip["source_url"])
+            with link_col2:
+                if clip.get("source_page"):
+                    st.link_button("Open source item page", clip["source_page"])
+
+            if show_inset:
+                video_id = clip.get("video_id", "")
+                if video_id:
+                    video_url = f"{API_BASE}/videos/{video_id}"
+                    try:
+                        st.video(video_url, format=clip.get("mime_type") or "video/mp4")
+                        st.caption(f"Inset preview: `{video_id}`")
+                    except Exception as e:
+                        st.warning(f"Unable to load video preview: {e}")
+                else:
+                    st.info("No video preview available for this clip.")
 
             if clip.get("evidence"):
                 with st.expander("Evidence Details"):
                     st.json(clip.get("evidence", {}))
+
+            if clip.get("annotations"):
+                with st.expander("Dataset Annotations"):
+                    st.json(clip.get("annotations", {}))
 
     st.divider()
 

@@ -19,18 +19,33 @@ def test_tool_registry_lists_tools():
 
 
 def test_vector_search_tool():
-    """Test vector search tool."""
+    """Test vector search tool returns query-relevant real results."""
     tool = VectorSearchTool()
-    result = tool.run({"query": "test", "top_k": 5})
+    result = tool.run({"query": "coffee", "top_k": 5})
     assert "results" in result
     assert len(result["results"]) > 0
+    assert "coffee" in result["results"][0]["title"].lower()
 
 
 def test_bm25_search_tool():
     """Test BM25 search tool."""
     tool = BM25SearchTool()
-    result = tool.run({"query": "test", "top_k": 5})
+    result = tool.run({"query": "coffee", "top_k": 5})
     assert "results" in result
+    assert len(result["results"]) > 0
+
+
+def test_search_tool_honors_dataset_filter():
+    tool = BM25SearchTool()
+    result = tool.run(
+        {
+            "query": "LeBron guard Steph",
+            "top_k": 5,
+            "filters": {"dataset": "snapugc"},
+        }
+    )
+    assert result["results"]
+    assert all(row["dataset"] == "snapugc" for row in result["results"])
 
 
 def test_logo_detection_tool():

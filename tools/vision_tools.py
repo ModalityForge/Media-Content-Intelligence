@@ -65,6 +65,8 @@ class LogoDetectionTool(BaseMCPTool):
 
         detections = []
         for clip_id in clip_ids:
+            if not target_brands:
+                continue
             if random.random() > 0.3:
                 num_detections = random.randint(1, len(target_brands))
                 detected_brands = random.sample(target_brands, num_detections)
@@ -104,8 +106,10 @@ class TalentMatchTool(BaseMCPTool):
 
         matches = []
         for clip_id in clip_ids:
+            if not target_talents:
+                continue
             if random.random() > 0.4:
-                num_matches = random.randint(1, 2)
+                num_matches = random.randint(1, min(2, len(target_talents)))
                 matched_talents = random.sample(target_talents, num_matches)
                 for talent in matched_talents:
                     matches.append(
@@ -144,6 +148,8 @@ class ActionClassificationTool(BaseMCPTool):
 
         classifications = []
         for clip_id in clip_ids:
+            if not target_actions:
+                continue
             action = random.choice(target_actions)
             classifications.append(
                 {

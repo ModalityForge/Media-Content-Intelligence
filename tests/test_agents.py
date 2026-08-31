@@ -15,9 +15,9 @@ def validator():
     return EvidenceValidatorAgent()
 
 
-def test_orchestrator_calls_validator(orchestrator):
+async def test_orchestrator_calls_validator(orchestrator):
     """Test orchestrator calls evidence validator."""
-    result = orchestrator.run(
+    result = await orchestrator.run(
         query="Find Messi drinking Pepsi",
         max_results=5,
         trace_id="test-001",

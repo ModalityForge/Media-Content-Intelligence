@@ -41,6 +41,17 @@ class CandidateClip(BaseModel):
     end_time: float
     score: float
     relevance_reason: str
+    title: str | None = Field(default=None, description="Clip title")
+    file_path: str | None = Field(default=None, description="Path to the media file")
+    description: str | None = Field(default=None, description="Catalog description")
+    source: str | None = Field(default=None, description="Original media source")
+    source_url: str | None = Field(default=None, description="Exact original media asset")
+    source_page: str | None = Field(default=None, description="Original dataset item page")
+    asset_name: str | None = Field(default=None, description="Original media asset name")
+    dataset: str | None = Field(default=None, description="Local dataset name")
+    content_type: str = Field(default="video", description="Advertisement or social media")
+    mime_type: str | None = Field(default=None, description="Preview MIME type")
+    annotations: dict[str, Any] = Field(default_factory=dict)
     evidence: dict[str, Any] = Field(default_factory=dict)
 
 
