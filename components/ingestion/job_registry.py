@@ -1,7 +1,7 @@
 """Job registry for tracking ingestion jobs."""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 
@@ -19,7 +19,7 @@ class JobRegistry:
             "video_path": video_path,
             "status": "queued",
             "priority": priority,
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
             "progress": 0.0,
         }
         return job_id

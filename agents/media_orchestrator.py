@@ -61,7 +61,7 @@ class MediaOrchestratorAgent:
 
         if "germany" in query.lower():
             intent["territory"] = "Germany"
-        elif "us" in query.lower() or "usa" in query.lower():
+        elif re.search(r"\b(?:us|usa|united states)\b", query, re.IGNORECASE):
             intent["territory"] = "USA"
 
         if "30-second" in query.lower() or "30s" in query.lower():

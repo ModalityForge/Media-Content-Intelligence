@@ -1,7 +1,7 @@
 """Output and export MCP tools."""
 
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from tools.base import BaseMCPTool
@@ -104,7 +104,7 @@ class ExportClipTool(BaseMCPTool):
             "export_id": export_id,
             "clip_id": clip_id,
             "download_url": f"/downloads/{export_id}.{clip_format}",
-            "expires_at": (datetime.utcnow() + timedelta(hours=24)).isoformat(),
+            "expires_at": (datetime.now(timezone.utc) + timedelta(hours=24)).isoformat(),
             "status": "ready",
             "quality": quality,
         }
@@ -142,6 +142,6 @@ class SendAlertTool(BaseMCPTool):
             "message": message,
             "clip_id": clip_id,
             "severity": severity,
-            "sent_at": datetime.utcnow().isoformat(),
+            "sent_at": datetime.now(timezone.utc).isoformat(),
             "status": "sent",
         }

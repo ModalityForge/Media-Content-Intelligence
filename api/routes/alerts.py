@@ -1,7 +1,7 @@
 """Alert endpoints."""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter
 
@@ -45,7 +45,7 @@ async def create_alert(alert: AlertEvent) -> AlertEvent:
     if not alert.alert_id:
         alert.alert_id = f"alert-{uuid.uuid4().hex[:8]}"
     if not alert.created_at:
-        alert.created_at = datetime.utcnow()
+        alert.created_at = datetime.now(timezone.utc)
 
     alerts_storage.append(alert.model_dump())
     return alert
@@ -66,6 +66,6 @@ async def acknowledge_alert(alert_id: str) -> dict:
     for alert in alerts_storage:
         if alert["alert_id"] == alert_id:
             alert["acknowledged"] = True
-            alert["acknowledged_at"] = datetime.utcnow().isoformat()
+            alert["acknowledged_at"] = datetime.now(timezone.utc).isoformat()
             return {"status": "acknowledged"}
     return {"error": "Alert not found"}

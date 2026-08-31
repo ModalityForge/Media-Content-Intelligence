@@ -3,7 +3,7 @@
 import inspect
 import uuid
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Callable
 
 
@@ -80,7 +80,7 @@ def create_task(
         from_agent=from_agent,
         to_agent=to_agent,
         payload=task_payload,
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
         message_type="task",
     )
 
@@ -110,13 +110,13 @@ async def send_task(
             task_id=task.task_id,
             status="completed",
             output=result,
-            completed_at=datetime.utcnow(),
+            completed_at=datetime.now(timezone.utc),
         ).to_dict()
     except Exception as e:
         return A2AResult(
             task_id=task.task_id,
             status="failed",
             output={},
-            completed_at=datetime.utcnow(),
+            completed_at=datetime.now(timezone.utc),
             error=str(e),
         ).to_dict()

@@ -1,7 +1,7 @@
 """Feedback endpoints."""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter
 
@@ -23,7 +23,7 @@ async def submit_feedback(request: FeedbackRequest) -> dict:
         "clip_id": request.clip_id,
         "feedback": request.feedback,
         "comment": request.comment,
-        "created_at": datetime.utcnow().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
     }
 
     feedback_storage.append(record)

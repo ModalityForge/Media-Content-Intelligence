@@ -1,7 +1,7 @@
 """Feedback service."""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 
@@ -25,7 +25,7 @@ class FeedbackService:
             "clip_id": clip_id,
             "feedback_type": feedback_type,
             "comment": comment,
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
         }
 
         self.feedback.append(record)

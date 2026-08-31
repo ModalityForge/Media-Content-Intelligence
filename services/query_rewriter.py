@@ -59,7 +59,7 @@ def extract_filters(query: str) -> dict[str, Any]:
 
     if "germany" in query.lower():
         filters["territory"] = "Germany"
-    elif "us" in query.lower() or "usa" in query.lower():
+    elif re.search(r"\b(?:us|usa|united states)\b", query, re.IGNORECASE):
         filters["territory"] = "USA"
 
     if "30-second" in query.lower() or "30s" in query.lower():

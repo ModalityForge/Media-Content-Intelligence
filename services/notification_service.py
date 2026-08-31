@@ -1,7 +1,7 @@
 """Notification service."""
 
 from typing import Any
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class NotificationService:
@@ -24,7 +24,7 @@ class NotificationService:
             "type": notification_type,
             "message": message,
             "metadata": metadata or {},
-            "sent_at": datetime.utcnow().isoformat(),
+            "sent_at": datetime.now(timezone.utc).isoformat(),
             "status": "sent",
         }
 

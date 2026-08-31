@@ -1,7 +1,7 @@
 """Ingestion endpoints."""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, BackgroundTasks
 
@@ -27,7 +27,7 @@ async def ingest_video(
         job_id=job_id,
         status="queued",
         message="Video ingestion job queued",
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(timezone.utc),
     )
 
 

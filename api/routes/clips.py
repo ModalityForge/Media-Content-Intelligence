@@ -1,7 +1,7 @@
 """Clip export endpoints."""
 
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter
 
@@ -19,7 +19,7 @@ async def export_clip(request: ClipExportRequest) -> ClipExportResponse:
         export_id=export_id,
         status="completed",
         download_url=f"/downloads/{export_id}.mp4",
-        expires_at=datetime.utcnow() + timedelta(hours=24),
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=24),
     )
 
 

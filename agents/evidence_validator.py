@@ -1,6 +1,6 @@
 """Evidence Validator Agent."""
 
-import random
+import re
 from typing import Any
 
 from app.schemas import EvidenceValidationResult, ValidationResultItem
@@ -28,8 +28,6 @@ class EvidenceValidatorAgent:
         logger.info("Validating evidence", clip_id=clip_id, criteria=criteria)
 
         results = []
-        overall_passed = True
-        overall_confidence = 0.8
 
         talent_required = any(
             t in query.lower() for t in ["messi", "ronaldo", "talent", "player", "athlete"]
@@ -38,53 +36,66 @@ class EvidenceValidatorAgent:
             a in query.lower()
             for a in ["drinking", "celebrating", "scoring", "running", "action"]
         )
-        brand_required = "adidas" in query.lower() or "pepsi" in query.lower()
+        required_brands = re.findall(
+            r"\b(adidas|pepsi|coca-cola|coke|apple|samsung)\b",
+            query,
+            re.IGNORECASE,
+        )
+        brand_required = bool(required_brands)
         excluded_brand = "nike" in query.lower()
 
         if "talent_present" in criteria or talent_required:
             visual = evidence_bundle.get("visual_evidence", {})
             talent_matches = visual.get("talent_matches", [])
-            passed = len(talent_matches) > 0 if talent_matches else random.choice([True, True, False])
+            passed = bool(talent_matches)
             results.append(
                 ValidationResultItem(
                     criterion="talent_present",
                     passed=passed,
-                    confidence=0.85,
-                    reason=f"Talent detected: {len(talent_matches)} matches" if passed else "No talent detected",
+                    confidence=0.85 if passed else 0.0,
+                    reason=(
+                        f"Talent detected: {len(talent_matches)} matches"
+                        if passed
+                        else "No verified talent evidence"
+                    ),
                 )
             )
-            if not passed:
-                overall_passed = False
 
         if "action_detected" in criteria or action_required:
             visual = evidence_bundle.get("visual_evidence", {})
             actions = visual.get("actions", [])
-            passed = len(actions) > 0 if actions else random.choice([True, True, False])
+            passed = bool(actions)
             results.append(
                 ValidationResultItem(
                     criterion="action_detected",
                     passed=passed,
-                    confidence=0.8,
-                    reason=f"Action classified: {actions}" if passed else "No action detected",
+                    confidence=0.8 if passed else 0.0,
+                    reason=f"Action classified: {actions}" if passed else "No verified action evidence",
                 )
             )
-            if not passed:
-                overall_passed = False
 
         if "required_brands_visible" in criteria or brand_required:
             visual = evidence_bundle.get("visual_evidence", {})
             logos = visual.get("logos", [])
-            passed = any("adidas" in str(l).lower() for l in logos) or random.choice([True, True, False])
+            expected = [brand.lower() for brand in required_brands]
+            detected = [str(logo).lower() for logo in logos]
+            passed = (
+                any(brand in logo for brand in expected for logo in detected)
+                if expected
+                else bool(detected)
+            )
             results.append(
                 ValidationResultItem(
                     criterion="required_brands_visible",
                     passed=passed,
-                    confidence=0.9,
-                    reason="Required brand detected" if passed else "Required brand not visible",
+                    confidence=0.9 if passed else 0.0,
+                    reason=(
+                        "Required brand detected"
+                        if passed
+                        else "No verified evidence for the required brand"
+                    ),
                 )
             )
-            if not passed:
-                overall_passed = False
 
         if "excluded_brands_absent" in criteria or excluded_brand:
             visual = evidence_bundle.get("visual_evidence", {})
@@ -98,11 +109,9 @@ class EvidenceValidatorAgent:
                     reason="Excluded brand not present" if passed else "Excluded brand detected",
                 )
             )
-            if not passed:
-                overall_passed = False
 
         rights = evidence_bundle.get("rights_evidence", {})
-        rights_cleared = rights.get("rights_cleared", True)
+        rights_cleared = rights.get("rights_cleared", False)
         results.append(
             ValidationResultItem(
                 criterion="rights_cleared",
@@ -111,8 +120,10 @@ class EvidenceValidatorAgent:
                 reason=rights.get("explanation", "Rights check completed"),
             )
         )
-        if not rights_cleared:
-            overall_passed = False
+        overall_passed = all(result.passed for result in results)
+        overall_confidence = (
+            sum(result.confidence for result in results) / len(results) if results else 0.0
+        )
 
         human_review = self.requires_human_review(
             EvidenceValidationResult(
@@ -148,11 +159,7 @@ class EvidenceValidatorAgent:
         if result.overall_confidence < 0.7:
             return True
 
-        failed_critical = [
-            r for r in result.results if not r.passed and r.criterion in ["rights_cleared", "excluded_brands_absent"]
-        ]
-
-        if len(failed_critical) > 0:
+        if any(not item.passed for item in result.results):
             return True
 
         return False

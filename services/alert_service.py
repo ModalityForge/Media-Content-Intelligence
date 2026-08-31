@@ -1,7 +1,7 @@
 """Alert service."""
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 
@@ -27,7 +27,7 @@ class AlertService:
             "severity": severity,
             "clip_id": clip_id,
             "metadata": metadata or {},
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
             "acknowledged": False,
         }
 
@@ -56,7 +56,7 @@ class AlertService:
         for alert in self.alerts:
             if alert["alert_id"] == alert_id:
                 alert["acknowledged"] = True
-                alert["acknowledged_at"] = datetime.utcnow().isoformat()
+                alert["acknowledged_at"] = datetime.now(timezone.utc).isoformat()
                 return True
         return False
 
