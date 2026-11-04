@@ -18,19 +18,23 @@ README_PATH = PROJECT_ROOT / "README.md"
 
 DIAGRAMS = {
     "media-intelligence-workflow": {
-        "Data Sources",
-        "Ingestion & Indexing",
-        "Search & Orchestration",
-        "Evidence & Governance",
-        "Delivery & Observability",
+        "Experience",
+        "Orchestration",
+        "Retrieval Intelligence",
+        "Evidence Governance",
+        "Observability",
+        "Ranked, explainable media results",
     },
     "search-governance-flow": {
         "Natural-language query",
-        "Hybrid retrieval",
-        "Evidence Validator",
-        "Guardrails",
-        "Human review",
-        "Search response",
+        "Intent + filters",
+        "Metadata search",
+        "BM25 search",
+        "RRF rank fusion",
+        "Evidence assessment",
+        "Evidence sufficient?",
+        "Ranked response",
+        "Human review required",
     },
 }
 
@@ -51,6 +55,11 @@ def test_excalidraw_source_is_editable(name: str, required_labels: set[str]) -> 
         if element.get("type") == "text"
     }
     assert required_labels <= labels
+    assert all(
+        element.get("roughness") == 0
+        for element in document["elements"]
+        if element.get("type") != "text" and "roughness" in element
+    )
 
 
 @pytest.mark.parametrize(("name", "required_labels"), DIAGRAMS.items())
@@ -65,6 +74,49 @@ def test_svg_export_is_accessible(name: str, required_labels: set[str]) -> None:
     assert root.get("role") == "img"
     assert root.get("aria-labelledby")
     assert all(label in exported_text for label in required_labels)
+
+
+@pytest.mark.parametrize("name", DIAGRAMS)
+def test_svg_export_uses_clean_enterprise_canvas(name: str) -> None:
+    """Rendered diagrams use the approved canvas and clean SVG styling."""
+    svg_path = DIAGRAM_DIR / "rendered" / f"{name}.svg"
+    root = ElementTree.parse(svg_path).getroot()
+    source = svg_path.read_text(encoding="utf-8")
+    assert root.get("width") == "1600" and root.get("height") == "900"
+    assert root.get("viewBox") == "0 0 1600 900"
+    assert "feTurbulence" not in source
+    assert "feDisplacementMap" not in source
+
+
+def test_readme_excludes_internal_repository_strategy_disclosure() -> None:
+    """Internal repository strategy details stay out of the public README."""
+    readme = " ".join(README_PATH.read_text(encoding="utf-8").lower().split())
+    for phrase in ("retrieval strategy", "dataset research"):
+        assert phrase not in readme
+
+
+@pytest.mark.parametrize("name", DIAGRAMS)
+def test_excalidraw_drawables_use_zero_roughness(name: str) -> None:
+    """Editable drawable elements use clean zero roughness."""
+    source_path = DIAGRAM_DIR / f"{name}.excalidraw"
+    document = json.loads(source_path.read_text(encoding="utf-8"))
+    assert all(
+        element["roughness"] == 0
+        for element in document["elements"]
+        if element.get("type") != "text" and "roughness" in element
+    )
+
+
+def test_readme_has_approved_portfolio_template_structure() -> None:
+    """The public README follows the approved portfolio template structure."""
+    readme = README_PATH.read_text(encoding="utf-8").lower()
+    sections = (
+        "hero navigation", "table of contents", "about the project", "key capabilities",
+        "architecture", "my contribution", "built with", "getting started", "usage",
+        "api reference", "evaluation and reproducibility", "roadmap", "documentation",
+        "contact", "license", "back to top",
+    )
+    assert all(section in readme for section in sections)
 
 
 def test_readme_embeds_both_visual_explanations() -> None:
