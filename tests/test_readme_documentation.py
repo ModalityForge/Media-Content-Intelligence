@@ -94,16 +94,18 @@ def test_readme_excludes_internal_repository_strategy_disclosure() -> None:
     paths = [README_PATH]
     paths.extend(DIAGRAM_DIR / "rendered" / f"{name}.svg" for name in DIAGRAMS)
     paths.extend(DIAGRAM_DIR / f"{name}.excalidraw" for name in DIAGRAMS)
-    public_text = " ".join(path.read_text(encoding="utf-8").lower() for path in paths)
+    public_text = " ".join(path.read_text(encoding="utf-8") for path in paths)
     forbidden_concepts = (
+        r"\b(?:git[ -]?ignore|gitignore)\b",
         r"\b(?:git[ -]?ignore(?:d)?|ignored|uncommitted)\s+(?:files?|code|implementation)\b",
         r"\bprivate\s+(?:code|implementation)\b",
+        r"\brestricted\s+storage\b",
         r"\b(?:raw|restricted)\s+(?:media|videos?|assets)\b.{0,100}\b(?:stay|stays|remain|remains|kept|local)\b",
         r"\b(?:media|storage)\b.{0,100}\b(?:stay|stays|remain|remains|kept)\s+local\b",
         r"\bdownload\s+(?:strategy|logic|tooling)\b",
     )
     for concept in forbidden_concepts:
-        assert re.search(concept, public_text) is None
+        assert re.search(concept, public_text, re.I) is None
 
 
 @pytest.mark.parametrize("name", DIAGRAMS)
