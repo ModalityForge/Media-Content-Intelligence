@@ -1,17 +1,11 @@
-"""Storage module."""
+"""Storage package for the deterministic public video catalog.
 
-from storage.vector_db import VectorDB, vector_db
-from storage.metadata_db import MetadataDB, metadata_db
-from storage.object_store import ObjectStore, object_store
-from storage.redis_cache import RedisCache, redis_cache
+Importing this package has no side effects. The runnable application imports
+``storage.video_catalog`` explicitly, while experimental database and cache
+adapters remain local-only.
 
-__all__ = [
-    "VectorDB",
-    "vector_db",
-    "MetadataDB",
-    "metadata_db",
-    "ObjectStore",
-    "object_store",
-    "RedisCache",
-    "redis_cache",
-]
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
+
+__all__ = ["video_catalog"]

@@ -1,14 +1,12 @@
-"""Agents module."""
+"""Public agent package for the MCI orchestration runtime.
 
-from agents.state import MCIState
-from agents.media_orchestrator import MediaOrchestratorAgent
-from agents.evidence_validator import EvidenceValidatorAgent
-from agents.graph import AgentGraph, graph
+The package initializer deliberately avoids importing concrete agent modules.
+Callers import the orchestrator, validator, protocol, or state from their
+own modules so importing :mod:`agents` cannot pull local-only experimental
+graphs into a clean public installation.
 
-__all__ = [
-    "MCIState",
-    "MediaOrchestratorAgent",
-    "EvidenceValidatorAgent",
-    "AgentGraph",
-    "graph",
-]
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
+
+__all__ = ["a2a_protocol", "evidence_validator", "media_orchestrator", "state"]

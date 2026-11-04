@@ -1,4 +1,13 @@
-"""MCP Tool Registry."""
+"""Registry for deterministic tools available to the public orchestrator.
+
+The registry intentionally exposes only the retrieval operations exercised by
+the public application. Random mock vision, audio, policy, and output tools are
+not imported or registered, so they cannot affect a result or become hidden
+runtime dependencies.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import asyncio
 import time
@@ -120,54 +129,12 @@ def _register_default_tools(registry: MCPToolRegistry) -> None:
     from tools.retrieval_tools import (
         VectorSearchTool,
         BM25SearchTool,
-        MetadataFilterTool,
         RRFFusionTool,
-        RerankResultsTool,
-    )
-    from tools.vision_tools import (
-        ObjectDetectionTool,
-        LogoDetectionTool,
-        TalentMatchTool,
-        ActionClassificationTool,
-        TrackingTool,
-        PoseEstimationTool,
-    )
-    from tools.audio_ocr_tools import ASRTool, OCRTool, CaptionGenerationTool
-    from tools.policy_tools import (
-        RightsCheckTool,
-        SponsorshipPolicyTool,
-        ExclusionCheckTool,
-        ContentRatingTool,
-    )
-    from tools.output_tools import (
-        ClipGenerationTool,
-        FaceBlurTool,
-        ExportClipTool,
-        SendAlertTool,
     )
 
     for tool_cls in [
         VectorSearchTool,
         BM25SearchTool,
-        MetadataFilterTool,
         RRFFusionTool,
-        RerankResultsTool,
-        ObjectDetectionTool,
-        LogoDetectionTool,
-        TalentMatchTool,
-        ActionClassificationTool,
-        TrackingTool,
-        PoseEstimationTool,
-        ASRTool,
-        OCRTool,
-        CaptionGenerationTool,
-        RightsCheckTool,
-        SponsorshipPolicyTool,
-        ExclusionCheckTool,
-        ContentRatingTool,
-        ClipGenerationTool,
-        FaceBlurTool,
-        ExportClipTool,
-        SendAlertTool,
     ]:
         registry.register(tool_cls())

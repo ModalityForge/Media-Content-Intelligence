@@ -1,5 +1,13 @@
-"""API routes."""
+"""Route modules shipped in the public MCI application.
 
-from api.routes import health, ingest, search, clips, alerts, feedback
+Only implemented, demonstrable routes are exported. Placeholder ingestion,
+clip-generation, and alert routes remain local and are intentionally excluded
+from the public application contract.
 
-__all__ = ["health", "ingest", "search", "clips", "alerts", "feedback"]
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
+
+from api.routes import feedback, health, search, videos
+
+__all__ = ["feedback", "health", "search", "videos"]

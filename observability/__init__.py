@@ -1,4 +1,12 @@
-"""Observability module."""
+"""Public logging and metrics interface for MCI.
+
+The package exposes the structured logger and Prometheus instruments used by
+the runnable API. Experimental tracing and cost-accounting implementations are
+kept outside the public runtime boundary.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from observability.logger import get_logger
 from observability.metrics import (
@@ -13,7 +21,6 @@ from observability.metrics import (
     CACHE_MISSES,
     ACTIVE_JOBS,
 )
-from observability.trace import trace, get_trace_id, create_trace_id
 
 __all__ = [
     "get_logger",
@@ -27,7 +34,4 @@ __all__ = [
     "CACHE_HITS",
     "CACHE_MISSES",
     "ACTIVE_JOBS",
-    "trace",
-    "get_trace_id",
-    "create_trace_id",
 ]

@@ -1,8 +1,16 @@
-"""FastAPI application entry point."""
+"""Create and expose the public Media Content Intelligence FastAPI service.
+
+The application serves health, deterministic catalog search, exact authorized
+video previews, feedback, and Prometheus metrics. Placeholder operational
+routes are intentionally excluded from the public API until their backing
+workers and persistence are production-ready.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import time
 from contextlib import asynccontextmanager
-from datetime import datetime
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,7 +24,7 @@ from app.dependencies import generate_trace_id, set_trace_id
 from observability.logger import get_logger
 from observability.metrics import init_metrics
 
-from api.routes import health, ingest, search, clips, alerts, feedback, videos
+from api.routes import feedback, health, search, videos
 
 logger = get_logger(__name__)
 
@@ -94,10 +102,7 @@ app.add_middleware(TraceMetricsMiddleware)
 
 
 app.include_router(health.router, prefix="/health", tags=["Health"])
-app.include_router(ingest.router, prefix="/ingest", tags=["Ingestion"])
 app.include_router(search.router, prefix="/search", tags=["Search"])
-app.include_router(clips.router, prefix="/clips", tags=["Clips"])
-app.include_router(alerts.router, prefix="/alerts", tags=["Alerts"])
 app.include_router(feedback.router, prefix="/feedback", tags=["Feedback"])
 app.include_router(videos.router, prefix="/videos", tags=["Videos"])
 
