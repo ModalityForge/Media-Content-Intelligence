@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1450" height="720" viewBox="0 0 1450 720" role="img" aria-labelledby="title desc">
+  <title id="title">Search, evidence validation, governance, and human review flow</title>
+  <desc id="desc">A query moves through hybrid retrieval, evidence validation, and guardrails. Passed results become a search response while missing evidence or rights is routed to human review.</desc>
+  <defs>
+    <filter id="rough" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence baseFrequency="0.012" numOctaves="2" seed="13" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="1.1"/></filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#2b8a3e"/></marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#e67700"/></marker>
+    <style>.heading{font:700 27px Inter,system-ui,sans-serif;fill:#0f172a}.sub{font:600 21px Inter,system-ui,sans-serif}.body{font:17px Inter,system-ui,sans-serif;fill:#334155}.small{font:15px Inter,system-ui,sans-serif;fill:#475569}.card{stroke-width:2.5;filter:url(#rough)}.flow{stroke:#64748b;stroke-width:3;fill:none;marker-end:url(#arrow)}</style>
+  </defs>
+  <rect width="1450" height="720" fill="#fcfcfd"/>
+  <text x="725" y="55" class="heading" text-anchor="middle">Relevance is retrieved; permission and evidence are validated</text>
+  <text x="725" y="86" class="small" text-anchor="middle">The fail-safe path makes uncertainty visible and reviewable</text>
+
+  <path d="M280 310 C305 301 325 319 350 310" class="flow"/><path d="M570 310 C595 301 615 319 640 310" class="flow"/><path d="M860 310 C885 301 905 319 930 310" class="flow"/>
+  <path d="M1130 310 C1155 301 1180 319 1210 310" stroke="#2b8a3e" stroke-width="3" fill="none" marker-end="url(#arrowGreen)"/>
+  <path d="M1030 400 C1040 438 1015 462 1030 500" stroke="#e67700" stroke-width="3" stroke-dasharray="8 7" fill="none" marker-end="url(#arrowOrange)"/>
+  <text x="1170" y="286" class="small" text-anchor="middle" fill="#2b8a3e">validated</text><text x="1085" y="460" class="small" fill="#e67700">missing / uncertain</text>
+
+  <g><rect x="70" y="250" width="210" height="120" rx="22" fill="#e7f5ff" stroke="#1e3a5f" class="card"/><text x="175" y="294" class="sub" text-anchor="middle" fill="#1e3a5f"><tspan x="175">Natural-language</tspan><tspan x="175" dy="27">query</tspan></text></g>
+  <g><rect x="350" y="220" width="220" height="180" rx="22" fill="#f3f0ff" stroke="#5f3dc4" class="card"/><text x="460" y="266" class="sub" text-anchor="middle" fill="#5f3dc4">Hybrid retrieval</text><text x="460" y="319" class="body" text-anchor="middle"><tspan x="460">Metadata + BM25</tspan><tspan x="460" dy="31">RRF fusion</tspan></text></g>
+  <g><rect x="640" y="220" width="220" height="180" rx="22" fill="#e3fafc" stroke="#0b7285" stroke-width="4" class="card"/><text x="750" y="266" class="sub" text-anchor="middle" fill="#0b7285">Evidence Validator</text><text x="750" y="319" class="body" text-anchor="middle"><tspan x="750">Evidence present?</tspan><tspan x="750" dy="31">Rights known?</tspan></text></g>
+  <g><rect x="930" y="220" width="200" height="180" rx="22" fill="#fff0f6" stroke="#c2255c" class="card"/><text x="1030" y="266" class="sub" text-anchor="middle" fill="#c2255c">Guardrails</text><text x="1030" y="319" class="body" text-anchor="middle"><tspan x="1030">Brand exclusions</tspan><tspan x="1030" dy="31">PII + content safety</tspan></text></g>
+  <g><rect x="1210" y="220" width="200" height="180" rx="22" fill="#ebfbee" stroke="#2b8a3e" class="card"/><text x="1310" y="266" class="sub" text-anchor="middle" fill="#2b8a3e">Search response</text><text x="1310" y="319" class="body" text-anchor="middle"><tspan x="1310">Ranked assets</tspan><tspan x="1310" dy="31">Traceable reasons</tspan></text></g>
+  <g><rect x="930" y="500" width="200" height="120" rx="22" fill="#fff4e6" stroke="#e67700" stroke-dasharray="8 7" class="card"/><text x="1030" y="551" class="sub" text-anchor="middle" fill="#e67700">Human review</text><text x="1030" y="582" class="small" text-anchor="middle">approve · reject · annotate</text></g>
+
+  <rect x="300" y="650" width="850" height="44" rx="15" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+  <text x="725" y="678" class="small" text-anchor="middle">No visual model inference is claimed when only metadata evidence exists; rights default to not cleared.</text>
+</svg>

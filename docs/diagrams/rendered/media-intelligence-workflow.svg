@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="680" viewBox="0 0 1400 680" role="img" aria-labelledby="title desc">
+  <title id="title">Media Content Intelligence end-to-end workflow</title>
+  <desc id="desc">Five connected stages show data sources, ingestion and indexing, search and orchestration, evidence and governance, and delivery and observability.</desc>
+  <defs>
+    <filter id="rough" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence baseFrequency="0.012" numOctaves="2" seed="8" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="1.1"/></filter>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker>
+    <style>
+      .heading{font:700 27px Inter,system-ui,sans-serif;fill:#0f172a}.sub{font:600 20px Inter,system-ui,sans-serif}.body{font:17px Inter,system-ui,sans-serif;fill:#334155}.small{font:15px Inter,system-ui,sans-serif;fill:#475569}.flow{stroke:#64748b;stroke-width:3;fill:none;marker-end:url(#arrow)}.card{stroke-width:2.5;filter:url(#rough)}
+    </style>
+  </defs>
+  <rect width="1400" height="680" fill="#fcfcfd"/>
+  <text x="700" y="55" class="heading" text-anchor="middle">From governed media to explainable search results</text>
+  <text x="700" y="87" class="small" text-anchor="middle">Current: deterministic local catalog search · Next: production multimodal indexing and inference</text>
+
+  <path d="M260 325 C278 318 292 330 310 325" class="flow"/><path d="M530 325 C548 318 562 330 580 325" class="flow"/>
+  <path d="M820 325 C838 318 852 330 870 325" class="flow"/><path d="M1090 325 C1108 318 1122 330 1140 325" class="flow"/>
+
+  <g><rect x="40" y="190" width="220" height="270" rx="22" fill="#e7f5ff" stroke="#1e3a5f" class="card"/><circle cx="150" cy="172" r="23" fill="#1e3a5f"/><text x="150" y="180" font-size="22" text-anchor="middle" fill="white">1</text><text x="150" y="235" class="sub" text-anchor="middle" fill="#1e3a5f">Data Sources</text><text x="150" y="294" class="body" text-anchor="middle"><tspan x="150" dy="0">Ad archives</tspan><tspan x="150" dy="31">Short social video</tspan><tspan x="150" dy="31">Influencer content</tspan><tspan x="150" dy="31">Metadata + rights</tspan></text></g>
+  <g><rect x="310" y="190" width="220" height="270" rx="22" fill="#f3f0ff" stroke="#5f3dc4" class="card"/><circle cx="420" cy="172" r="23" fill="#5f3dc4"/><text x="420" y="180" font-size="22" text-anchor="middle" fill="white">2</text><text x="420" y="230" class="sub" text-anchor="middle" fill="#5f3dc4"><tspan x="420">Ingestion &amp;</tspan><tspan x="420" dy="27">Indexing</tspan></text><text x="420" y="314" class="body" text-anchor="middle"><tspan x="420">Validate + register</tspan><tspan x="420" dy="31">Extract metadata</tspan><tspan x="420" dy="31">Build local catalog</tspan><tspan x="420" dy="31">Future ML indexes</tspan></text></g>
+  <g><rect x="580" y="155" width="240" height="340" rx="25" fill="#e3fafc" stroke="#0b7285" stroke-width="4" class="card"/><circle cx="700" cy="137" r="25" fill="#0b7285"/><text x="700" y="146" font-size="23" text-anchor="middle" fill="white">3</text><text x="700" y="205" class="sub" text-anchor="middle" fill="#0b7285"><tspan x="700">Search &amp;</tspan><tspan x="700" dy="28">Orchestration</tspan></text><text x="700" y="300" class="body" text-anchor="middle"><tspan x="700">Parse intent</tspan><tspan x="700" dy="31">Rewrite query + HyDE</tspan><tspan x="700" dy="31">BM25 + metadata search</tspan><tspan x="700" dy="31">RRF fusion</tspan><tspan x="700" dy="31">Candidate evidence</tspan></text></g>
+  <g><rect x="870" y="190" width="220" height="270" rx="22" fill="#fff0f6" stroke="#c2255c" class="card"/><circle cx="980" cy="172" r="23" fill="#c2255c"/><text x="980" y="180" font-size="22" text-anchor="middle" fill="white">4</text><text x="980" y="230" class="sub" text-anchor="middle" fill="#c2255c"><tspan x="980">Evidence &amp;</tspan><tspan x="980" dy="27">Governance</tspan></text><text x="980" y="314" class="body" text-anchor="middle"><tspan x="980">Validate evidence</tspan><tspan x="980" dy="31">Rights + brand safety</tspan><tspan x="980" dy="31">Security guardrails</tspan><tspan x="980" dy="31">Human review</tspan></text></g>
+  <g><rect x="1140" y="190" width="220" height="270" rx="22" fill="#ebfbee" stroke="#2b8a3e" class="card"/><circle cx="1250" cy="172" r="23" fill="#2b8a3e"/><text x="1250" y="180" font-size="22" text-anchor="middle" fill="white">5</text><text x="1250" y="230" class="sub" text-anchor="middle" fill="#2b8a3e"><tspan x="1250">Delivery &amp;</tspan><tspan x="1250" dy="27">Observability</tspan></text><text x="1250" y="314" class="body" text-anchor="middle"><tspan x="1250">API + Streamlit</tspan><tspan x="1250" dy="31">Exact source asset</tspan><tspan x="1250" dy="31">Trace + metrics</tspan><tspan x="1250" dy="31">Feedback loop</tspan></text></g>
+
+  <rect x="250" y="555" width="900" height="70" rx="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 7"/>
+  <text x="700" y="585" class="body" text-anchor="middle">Raw and restricted media stays local. Git contains code, schemas, diagrams, and reproducible download logic only.</text>
+  <text x="700" y="612" class="small" text-anchor="middle">Every returned asset retains source provenance; missing rights evidence triggers review rather than approval.</text>
+</svg>
