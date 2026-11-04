@@ -6,6 +6,7 @@ Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from xml.etree import ElementTree
 
@@ -89,10 +90,20 @@ def test_svg_export_uses_clean_enterprise_canvas(name: str) -> None:
 
 
 def test_readme_excludes_internal_repository_strategy_disclosure() -> None:
-    """Internal repository strategy details stay out of the public README."""
-    readme = " ".join(README_PATH.read_text(encoding="utf-8").lower().split())
-    for phrase in ("retrieval strategy", "dataset research"):
-        assert phrase not in readme
+    """Internal repository strategy details stay out of all public visuals."""
+    paths = [README_PATH]
+    paths.extend(DIAGRAM_DIR / "rendered" / f"{name}.svg" for name in DIAGRAMS)
+    paths.extend(DIAGRAM_DIR / f"{name}.excalidraw" for name in DIAGRAMS)
+    public_text = " ".join(path.read_text(encoding="utf-8").lower() for path in paths)
+    forbidden_concepts = (
+        r"\b(?:git[ -]?ignore(?:d)?|ignored|uncommitted)\s+(?:files?|code|implementation)\b",
+        r"\bprivate\s+(?:code|implementation)\b",
+        r"\b(?:raw|restricted)\s+(?:media|videos?|assets)\b.{0,100}\b(?:stay|stays|remain|remains|kept|local)\b",
+        r"\b(?:media|storage)\b.{0,100}\b(?:stay|stays|remain|remains|kept)\s+local\b",
+        r"\bdownload\s+(?:strategy|logic|tooling)\b",
+    )
+    for concept in forbidden_concepts:
+        assert re.search(concept, public_text) is None
 
 
 @pytest.mark.parametrize("name", DIAGRAMS)
@@ -108,15 +119,47 @@ def test_excalidraw_drawables_use_zero_roughness(name: str) -> None:
 
 
 def test_readme_has_approved_portfolio_template_structure() -> None:
-    """The public README follows the approved portfolio template structure."""
-    readme = README_PATH.read_text(encoding="utf-8").lower()
-    sections = (
-        "hero navigation", "table of contents", "about the project", "key capabilities",
-        "architecture", "my contribution", "built with", "getting started", "usage",
-        "api reference", "evaluation and reproducibility", "roadmap", "documentation",
-        "contact", "license", "back to top",
+    """The README has real section headings and links into those sections."""
+    readme = README_PATH.read_text(encoding="utf-8")
+    heading_ids: dict[str, str] = {}
+    heading_lines: list[tuple[int, str, str]] = []
+    for index, line in enumerate(readme.splitlines()):
+        markdown = re.match(r"^#{1,6}\s+(.+?)\s*#*\s*$", line)
+        html = re.search(r"<h[1-6](?:\s+id=[\"']([^\"']+)[\"'])?[^>]*>(.*?)</h[1-6]>", line, re.I)
+        if markdown:
+            title = re.sub(r"[`*_]", "", markdown.group(1)).strip()
+            slug = re.sub(r"[^a-z0-9 -]", "", title.lower()).replace(" ", "-")
+        elif html:
+            title = re.sub(r"<[^>]+>", "", html.group(2)).strip()
+            slug = html.group(1) or re.sub(r"[^a-z0-9 -]", "", title.lower()).replace(" ", "-")
+        else:
+            continue
+        heading_ids[title.lower()] = slug
+        heading_lines.append((index, title.lower(), slug))
+
+    required_headings = (
+        "table of contents", "about the project", "key capabilities", "architecture",
+        "my contribution", "built with", "getting started", "usage", "api reference",
+        "evaluation and reproducibility", "roadmap", "documentation", "contact", "license",
     )
-    assert all(section in readme for section in sections)
+    assert all(section in heading_ids for section in required_headings)
+
+    def anchor_links(text: str) -> list[tuple[str, str]]:
+        markdown_links = re.findall(r"\[([^\]]+)\]\(#([^)]+)\)", text, re.I)
+        html_links = re.findall(r"<a\b[^>]*href=[\"']#([^\"']+)[\"'][^>]*>(.*?)</a>", text, re.I | re.S)
+        return [(label.strip().lower(), target) for label, target in markdown_links] + [
+            (re.sub(r"<[^>]+>", "", label).strip().lower(), target)
+            for target, label in html_links
+        ]
+
+    links = anchor_links(readme)
+    first_section_line = min(index for index, title, _ in heading_lines if title != "media content intelligence")
+    hero_text = "\n".join(readme.splitlines()[:first_section_line])
+    hero_targets = {target for _, target in anchor_links(hero_text)}
+    assert len(hero_targets & set(heading_ids.values())) >= 4
+
+    top_slug = heading_lines[0][2]
+    assert any("back to top" in label and target == top_slug for label, target in links)
 
 
 def test_readme_embeds_both_visual_explanations() -> None:
