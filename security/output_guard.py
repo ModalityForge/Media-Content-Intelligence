@@ -1,4 +1,12 @@
-"""Output guard - filters restricted fields."""
+"""Prevent sensitive credential-shaped fields from leaving the public API.
+
+Candidate dictionaries are inspected by key name for passwords, API keys,
+secrets, tokens, and credentials. Callers may reject the complete object or
+obtain a copy in which restricted values are redacted.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from typing import Any
 
@@ -15,7 +23,7 @@ class OutputGuard:
     ]
 
     def __init__(self):
-        pass
+        """Create a stateless guard using the restricted-field vocabulary."""
 
     def is_safe(self, data: dict[str, Any]) -> bool:
         """Check if output data is safe."""

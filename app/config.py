@@ -1,4 +1,12 @@
-"""Application configuration using pydantic-settings."""
+"""Environment-backed configuration for the public MCI runtime.
+
+Settings centralize service identity, local catalog locations, optional
+integration endpoints, and feature flags. Values may be supplied by process
+environment variables or an uncommitted local ``.env`` file.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 

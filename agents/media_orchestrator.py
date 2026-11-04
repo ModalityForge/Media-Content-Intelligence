@@ -1,4 +1,12 @@
-"""Media Orchestrator Agent."""
+"""Coordinate query understanding, retrieval, validation, and guardrails.
+
+The orchestrator converts a natural-language request into structured intent,
+runs deterministic BM25/catalog retrieval and RRF fusion, constructs traceable
+candidates, invokes the evidence validator, and applies output safety checks.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import re
 import time
@@ -19,6 +27,7 @@ class MediaOrchestratorAgent:
     """Main orchestrator for media content intelligence."""
 
     def __init__(self):
+        """Initialize the public tool registry and deterministic validator."""
         self.name = "media_orchestrator"
         self.tool_registry = get_registry()
         self.evidence_validator = EvidenceValidatorAgent()
@@ -118,6 +127,7 @@ class MediaOrchestratorAgent:
         """Send evidence to validator agent via A2A protocol."""
 
         async def validation_handler(payload: dict[str, Any]) -> dict[str, Any]:
+            """Adapt the validator result to the A2A dictionary contract."""
             validation_result = self.evidence_validator.validate(payload)
             return validation_result.model_dump()
 

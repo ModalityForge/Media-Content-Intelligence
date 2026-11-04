@@ -1,4 +1,12 @@
-"""Agent state management."""
+"""Mutable execution state shared across one orchestrated search request.
+
+The dataclass records every major stage—parsed intent, rewritten queries, tool
+plans, evidence, candidates, validation, guardrails, and final output—so a
+request can be inspected without relying on implicit global agent state.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from dataclasses import dataclass, field
 from typing import Any

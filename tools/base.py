@@ -1,4 +1,12 @@
-"""Base MCP Tool class."""
+"""Abstract contract implemented by every callable MCI tool.
+
+The base class standardizes names, descriptions, JSON-like schemas, synchronous
+execution, asynchronous delegation, and required-field validation so the
+orchestrator can treat retrieval operations uniformly.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from abc import ABC, abstractmethod
 from typing import Any, Generic, TypeVar

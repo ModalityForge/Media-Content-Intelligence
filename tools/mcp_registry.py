@@ -24,16 +24,17 @@ class MCPToolRegistry:
     """Registry for MCP-style tools."""
 
     def __init__(self):
+        """Create an empty registry and bounded executor for async adapters."""
         self._tools: dict[str, BaseMCPTool] = {}
         self._executor = ThreadPoolExecutor(max_workers=10)
 
     def register(self, tool: BaseMCPTool) -> None:
-        """Register a tool."""
+        """Register or replace one tool under its stable public name."""
         self._tools[tool.name] = tool
         logger.info("Registered tool", tool_name=tool.name, description=tool.description)
 
     def get_tool(self, name: str) -> BaseMCPTool | None:
-        """Get a tool by name."""
+        """Return the registered tool for ``name``, or ``None`` if absent."""
         return self._tools.get(name)
 
     def list_tools(self) -> list[dict[str, Any]]:

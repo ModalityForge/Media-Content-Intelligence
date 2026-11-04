@@ -1,17 +1,67 @@
-"""Contract tests for the deliberately limited public application surface."""
+"""Contract tests for the deliberately limited public application surface.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from __future__ import annotations
 
 import subprocess
 import sys
+import ast
 from pathlib import Path
 
 from app.main import app
+from app.schemas import (
+    CandidateClip,
+    EvidenceValidationResult,
+    FeedbackRequest,
+    HealthResponse,
+    SearchRequest,
+    SearchResponse,
+    ValidationResultItem,
+)
 from tools.mcp_registry import get_registry
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 AUTHOR = "Prosenjit Banerjee <prosenjit.banerjee@gmail.com>"
+PUBLIC_RUNTIME_FILES = [
+    "app/__init__.py",
+    "app/config.py",
+    "app/dependencies.py",
+    "app/main.py",
+    "app/schemas.py",
+    "api/__init__.py",
+    "api/routes/__init__.py",
+    "api/routes/feedback.py",
+    "api/routes/health.py",
+    "api/routes/search.py",
+    "api/routes/videos.py",
+    "agents/__init__.py",
+    "agents/a2a_protocol.py",
+    "agents/evidence_validator.py",
+    "agents/media_orchestrator.py",
+    "agents/state.py",
+    "services/__init__.py",
+    "services/hyde_generator.py",
+    "services/query_rewriter.py",
+    "tools/__init__.py",
+    "tools/base.py",
+    "tools/mcp_registry.py",
+    "tools/retrieval_tools.py",
+    "storage/__init__.py",
+    "storage/video_catalog.py",
+    "security/__init__.py",
+    "security/input_guard.py",
+    "security/output_guard.py",
+    "observability/__init__.py",
+    "observability/logger.py",
+    "observability/metrics.py",
+    "frontend/app.py",
+    "scripts/check_publish_safety.py",
+    "scripts/healthcheck.py",
+]
 
 
 def test_public_api_excludes_unimplemented_operational_routes() -> None:
@@ -81,3 +131,40 @@ def test_runtime_boundary_files_identify_the_author() -> None:
     for relative_path in boundary_files:
         source = (PROJECT_ROOT / relative_path).read_text(encoding="utf-8")
         assert AUTHOR in source, relative_path
+
+
+def test_every_public_runtime_symbol_is_documented_and_attributed() -> None:
+    """Retained modules and their symbols explain ownership and behaviour."""
+    for relative_path in PUBLIC_RUNTIME_FILES:
+        source = (PROJECT_ROOT / relative_path).read_text(encoding="utf-8")
+        tree = ast.parse(source, filename=relative_path)
+        module_docstring = ast.get_docstring(tree) or ""
+
+        assert AUTHOR in module_docstring, relative_path
+        assert len(module_docstring) >= 80, relative_path
+
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)):
+                docstring = ast.get_docstring(node) or ""
+                assert len(docstring.strip()) >= 20, (
+                    f"{relative_path}:{node.lineno} {node.name}"
+                )
+
+
+def test_public_api_schema_fields_explain_their_contract() -> None:
+    """Every client-visible field contributes a useful OpenAPI description."""
+    public_models = [
+        SearchRequest,
+        CandidateClip,
+        SearchResponse,
+        ValidationResultItem,
+        EvidenceValidationResult,
+        FeedbackRequest,
+        HealthResponse,
+    ]
+
+    for model in public_models:
+        for name, field in model.model_fields.items():
+            assert field.description and len(field.description) >= 12, (
+                f"{model.__name__}.{name}"
+            )

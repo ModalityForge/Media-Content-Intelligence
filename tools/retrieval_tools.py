@@ -1,4 +1,12 @@
-"""Retrieval MCP tools."""
+"""Deterministic retrieval tools exposed by the public tool registry.
+
+The module adapts the local catalog to vector-compatible and BM25-style tool
+contracts, then combines independent rankings with Reciprocal Rank Fusion.
+No visual or audio model prediction is fabricated by these tools.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from typing import Any
 
@@ -88,7 +96,7 @@ class MetadataFilterTool(BaseMCPTool):
     output_schema = {"type": "object", "properties": {"results": {"type": "array"}}}
 
     def run(self, input_data: dict[str, Any]) -> dict[str, Any]:
-        """Filter by metadata."""
+        """Return pass records for supplied identifiers and metadata filters."""
         clip_ids = input_data.get("clip_ids", [])
         filters = input_data.get("filters", {})
 
@@ -118,7 +126,7 @@ class RRFFusionTool(BaseMCPTool):
     output_schema = {"type": "object", "properties": {"results": {"type": "array"}}}
 
     def run(self, input_data: dict[str, Any]) -> dict[str, Any]:
-        """Execute RRF fusion."""
+        """Fuse ranked result sets while preserving the best clip metadata."""
         result_sets = input_data.get("result_sets", [])
         k = input_data.get("k", 60)
         top_k = input_data.get("top_k", 10)
@@ -181,7 +189,7 @@ class RerankResultsTool(BaseMCPTool):
     output_schema = {"type": "object", "properties": {"results": {"type": "array"}}}
 
     def run(self, input_data: dict[str, Any]) -> dict[str, Any]:
-        """Rerank results."""
+        """Apply a deterministic lexical boost and return descending results."""
         results = input_data.get("results", [])
         query = input_data.get("query", "")
 

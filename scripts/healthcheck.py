@@ -1,4 +1,12 @@
-"""Healthcheck script."""
+"""Command-line health probe for the locally running public MCI API.
+
+The script requests the aggregate health endpoint with a bounded timeout and
+maps the outcome to a boolean and process exit status suitable for containers,
+deployment probes, and local smoke verification.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import httpx
 import sys

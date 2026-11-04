@@ -1,4 +1,12 @@
-"""HyDE (Hypothetical Document Embeddings) generator."""
+"""Generate deterministic HyDE-style text for catalog retrieval.
+
+The public implementation expands a query into an idealized media description
+without calling a private language model. The result gives retrieval code a
+richer textual representation while remaining reproducible offline.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from typing import Any
 

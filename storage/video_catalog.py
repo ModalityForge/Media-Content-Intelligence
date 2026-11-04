@@ -4,6 +4,9 @@ The catalog indexes both the advertisement subset and the separately stored
 social-media datasets. Search is metadata based: it never pretends that a
 visual embedding or model prediction exists when one has not been generated.
 Results remain explainable and point to the exact local file that was ranked.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
 """
 
 from __future__ import annotations
@@ -145,6 +148,7 @@ class VideoRecord:
 
 
 def _resolve_path(value: str | os.PathLike[str]) -> Path:
+    """Resolve absolute or project-relative paths without requiring existence."""
     path = Path(value).expanduser()
     return path if path.is_absolute() else (_PROJECT_ROOT / path).resolve()
 
@@ -156,10 +160,12 @@ def _tokenize(text: str) -> list[str]:
 
 
 def _unique(values: Iterable[str]) -> list[str]:
+    """Return non-empty strings once each while preserving input order."""
     return list(dict.fromkeys(values))
 
 
 def _safe_float(value: Any) -> float | None:
+    """Convert optional metadata to float, returning ``None`` when invalid."""
     if value in (None, ""):
         return None
     try:
@@ -169,6 +175,7 @@ def _safe_float(value: Any) -> float | None:
 
 
 def _slug(value: str, limit: int = 48) -> str:
+    """Create a bounded lowercase identifier suitable for stable catalog keys."""
     slug = re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")
     return slug[:limit] or "video"
 
@@ -182,6 +189,7 @@ class VideoCatalog:
         manifest: str | None = None,
         social_media_dir: str | None = None,
     ):
+        """Load configured local sources and build an in-memory BM25 index."""
         self.base_dir = _resolve_path(base_dir or settings.object_store_path)
         self.manifest_path = _resolve_path(
             manifest or self.base_dir / "ad_subset" / "manifest.jsonl"
@@ -197,6 +205,7 @@ class VideoCatalog:
         self._load()
 
     def _load(self) -> None:
+        """Discover advertisement and social-video records from configured roots."""
         self._load_advertisements()
         self._load_social_media()
         self._build_index()
@@ -289,6 +298,7 @@ class VideoCatalog:
             self._load_social_index(index_path)
 
     def _load_social_index(self, index_path: Path) -> None:
+        """Join one social annotation index to corresponding playable files."""
         try:
             payload = json.loads(index_path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
@@ -329,6 +339,7 @@ class VideoCatalog:
             )
 
     def _add_record(self, record: VideoRecord) -> None:
+        """Validate, de-duplicate, normalize, and register one local video record."""
         resolved = str(Path(record.file_path).resolve())
         if resolved in self._known_paths or not Path(resolved).is_file():
             return
@@ -343,6 +354,7 @@ class VideoCatalog:
 
     @staticmethod
     def _read_jsonl(path: Path) -> list[dict[str, Any]]:
+        """Read dictionary rows from JSON Lines while skipping corrupt entries."""
         if not path.is_file():
             return []
         rows: list[dict[str, Any]] = []
@@ -361,6 +373,7 @@ class VideoCatalog:
 
     @staticmethod
     def _row_path(row: dict[str, Any], fallback_dir: Path) -> Path | None:
+        """Resolve a manifest row to an existing playable local asset."""
         local_path = row.get("local_path")
         candidates = []
         if local_path:
@@ -373,17 +386,20 @@ class VideoCatalog:
 
     @staticmethod
     def _format_preference(path: Path) -> int:
+        """Rank media formats so duplicate assets choose the best preview."""
         return {".mp4": 4, ".webm": 3, ".ogg": 2, ".ogv": 2, ".mov": 1}.get(
             path.suffix.lower(), 0
         )
 
     @staticmethod
     def _sequence_from_filename(basename: str) -> str:
+        """Extract a leading sequence number or derive a stable filename slug."""
         match = re.match(r"(\d+)", basename)
         return match.group(1) if match else _slug(Path(basename).stem, 12)
 
     @staticmethod
     def _title_from_filename(basename: str) -> str:
+        """Convert downloader filenames into human-readable fallback titles."""
         name = Path(basename).stem
         parts = name.split("_", 1)
         if len(parts) > 1 and parts[0].isdigit():
@@ -403,6 +419,7 @@ class VideoCatalog:
 
     @staticmethod
     def _build_display_text(record: VideoRecord) -> str:
+        """Assemble weighted metadata without inventing visual evidence."""
         tags = (
             "advertisement commercial ad"
             if record.content_type == "advertisement"
@@ -423,17 +440,21 @@ class VideoCatalog:
         )
 
     def _build_index(self) -> None:
+        """Tokenize display documents and initialize BM25 when content exists."""
         self._tokenized_docs = [_tokenize(record.display_text) for record in self.records]
         if self._tokenized_docs and any(self._tokenized_docs):
             self._bm25 = BM25Okapi(self._tokenized_docs)
 
     @staticmethod
     def _term_group(term: str) -> set[str]:
+        """Return deterministic synonyms used to broaden one query term."""
         return _QUERY_EXPANSIONS.get(term, {term})
 
     @staticmethod
     def _matches_filters(record: VideoRecord, filters: dict[str, Any]) -> bool:
+        """Evaluate dataset, source, type, duration, playability, and brands."""
         def accepted(field_value: str, requested: Any) -> bool:
+            """Match one record field against an optional scalar or list filter."""
             if requested in (None, "", []):
                 return True
             values = requested if isinstance(requested, (list, tuple, set)) else [requested]
@@ -582,9 +603,11 @@ class VideoCatalog:
         return [result for _, _, result in ranked[:top_k]]
 
     def get(self, video_id: str) -> VideoRecord | None:
+        """Return the exact record for a stable identifier when present."""
         return self._by_video_id.get(video_id)
 
     def list_videos(self) -> list[dict[str, Any]]:
+        """Return public metadata and preview availability for every record."""
         return [
             {
                 "video_id": record.video_id,

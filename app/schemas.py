@@ -1,4 +1,12 @@
-"""Pydantic schemas for API requests and responses."""
+"""Validated data structures exchanged by MCI agents and HTTP endpoints.
+
+These Pydantic models form the public contract between clients, the search
+orchestrator, evidence validation, health monitoring, and feedback capture.
+Field descriptions are surfaced automatically through the OpenAPI schema.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from datetime import datetime
 from typing import Any
@@ -35,36 +43,36 @@ class SearchRequest(BaseModel):
 class CandidateClip(BaseModel):
     """A candidate clip from search."""
 
-    clip_id: str
-    video_id: str
-    start_time: float
-    end_time: float
-    score: float
-    relevance_reason: str
-    title: str | None = Field(default=None, description="Clip title")
-    file_path: str | None = Field(default=None, description="Path to the media file")
-    description: str | None = Field(default=None, description="Catalog description")
-    source: str | None = Field(default=None, description="Original media source")
-    source_url: str | None = Field(default=None, description="Exact original media asset")
-    source_page: str | None = Field(default=None, description="Original dataset item page")
-    asset_name: str | None = Field(default=None, description="Original media asset name")
-    dataset: str | None = Field(default=None, description="Local dataset name")
-    content_type: str = Field(default="video", description="Advertisement or social media")
-    mime_type: str | None = Field(default=None, description="Preview MIME type")
-    annotations: dict[str, Any] = Field(default_factory=dict)
-    evidence: dict[str, Any] = Field(default_factory=dict)
+    clip_id: str = Field(description="Stable identifier for this candidate clip")
+    video_id: str = Field(description="Catalog identifier of the exact source video")
+    start_time: float = Field(description="Candidate segment start time in seconds")
+    end_time: float = Field(description="Candidate segment end time in seconds")
+    score: float = Field(description="Normalized deterministic retrieval relevance score")
+    relevance_reason: str = Field(description="Human-readable explanation of matched metadata")
+    title: str | None = Field(default=None, description="Human-readable catalog title for the asset")
+    file_path: str | None = Field(default=None, description="Authorized local path used for exact preview streaming")
+    description: str | None = Field(default=None, description="Source-provided catalog description")
+    source: str | None = Field(default=None, description="Publisher, archive, or local source label")
+    source_url: str | None = Field(default=None, description="Exact publisher URL for the original media asset")
+    source_page: str | None = Field(default=None, description="Publisher page describing the source item")
+    asset_name: str | None = Field(default=None, description="Original filename or human-readable asset name")
+    dataset: str | None = Field(default=None, description="Dataset partition from which the asset was indexed")
+    content_type: str = Field(default="video", description="High-level media category such as advertisement or social media")
+    mime_type: str | None = Field(default=None, description="Browser-compatible MIME type for preview playback")
+    annotations: dict[str, Any] = Field(default_factory=dict, description="Source annotations retained without semantic reinterpretation")
+    evidence: dict[str, Any] = Field(default_factory=dict, description="Verified evidence attached by downstream inference or review")
 
 
 class SearchResponse(BaseModel):
     """Search response with candidate clips."""
 
-    query: str
-    rewritten_query: str
-    hyde_query: str | None = None
-    candidate_clips: list[CandidateClip]
-    total_found: int
-    trace_id: str
-    processing_time_ms: float
+    query: str = Field(description="Original natural-language query supplied by the client")
+    rewritten_query: str = Field(description="Deterministically expanded query used for retrieval")
+    hyde_query: str | None = Field(default=None, description="Hypothetical ideal media description used for retrieval")
+    candidate_clips: list[CandidateClip] = Field(description="Ranked, explainable candidate media segments")
+    total_found: int = Field(description="Number of candidates found before response truncation")
+    trace_id: str = Field(description="Request identifier propagated through logs and responses")
+    processing_time_ms: float = Field(description="End-to-end API processing latency in milliseconds")
 
 
 class ToolCallRecord(BaseModel):
@@ -86,21 +94,21 @@ class EvidenceValidationRequest(BaseModel):
 class ValidationResultItem(BaseModel):
     """Result for a single validation check."""
 
-    criterion: str
-    passed: bool
-    confidence: float
-    reason: str
+    criterion: str = Field(description="Stable name of the evidence or policy criterion")
+    passed: bool = Field(description="Whether supplied evidence satisfied the criterion")
+    confidence: float = Field(ge=0.0, le=1.0, description="Confidence supported by the supplied evidence")
+    reason: str = Field(description="Human-readable basis for the validation decision")
 
 
 class EvidenceValidationResult(BaseModel):
     """Result from evidence validation."""
 
-    clip_id: str
-    overall_passed: bool
-    overall_confidence: float
-    results: list[ValidationResultItem]
-    requires_human_review: bool = False
-    review_reason: str | None = None
+    clip_id: str = Field(description="Candidate clip identifier to which this decision applies")
+    overall_passed: bool = Field(description="Whether every evaluated criterion passed")
+    overall_confidence: float = Field(ge=0.0, le=1.0, description="Mean confidence across evaluated validation criteria")
+    results: list[ValidationResultItem] = Field(description="Individual evidence and policy decisions")
+    requires_human_review: bool = Field(default=False, description="Whether automatic evidence is insufficient for approval")
+    review_reason: str | None = Field(default=None, description="Explanation supplied when manual review is required")
 
 
 class ClipExportRequest(BaseModel):
@@ -123,7 +131,7 @@ class ClipExportResponse(BaseModel):
 
 
 class AlertEvent(BaseModel):
-    """Alert event."""
+    """Structured operational alert emitted for a media or policy event."""
 
     alert_id: str
     alert_type: str
@@ -137,16 +145,16 @@ class AlertEvent(BaseModel):
 class FeedbackRequest(BaseModel):
     """Feedback on a search result."""
 
-    query: str
-    clip_id: str
+    query: str = Field(description="Search query associated with the user judgement")
+    clip_id: str = Field(description="Candidate clip receiving the feedback")
     feedback: str = Field(..., description="thumbs_up, thumbs_down, or comment")
-    comment: str | None = None
+    comment: str | None = Field(default=None, description="Optional free-text explanation of the judgement")
 
 
 class HealthResponse(BaseModel):
     """Health check response."""
 
-    status: str
-    version: str
-    timestamp: datetime
-    services: dict[str, str]
+    status: str = Field(description="Aggregate health state of this API process")
+    version: str = Field(description="Semantic version of the running application")
+    timestamp: datetime = Field(description="Timezone-aware UTC time at which health was evaluated")
+    services: dict[str, str] = Field(description="Named component statuses included in the health decision")

@@ -40,9 +40,11 @@ class TraceMetricsMiddleware:
     """Add tracing and metrics without buffering streamed video responses."""
 
     def __init__(self, app: ASGIApp):
+        """Wrap the downstream ASGI application without buffering responses."""
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        """Attach a trace ID and record status and latency for one HTTP request."""
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
@@ -55,6 +57,7 @@ class TraceMetricsMiddleware:
         status_code = 500
 
         async def send_with_trace(message: Message) -> None:
+            """Intercept response-start messages to add tracing metadata."""
             nonlocal status_code
             if message["type"] == "http.response.start":
                 status_code = message["status"]
@@ -115,7 +118,7 @@ async def metrics():
 
 @app.get("/")
 async def root():
-    """Root endpoint."""
+    """Return the public service identity, semantic version, and status."""
     return {
         "service": settings.app_name,
         "version": "2.0.0",

@@ -1,4 +1,7 @@
-"""Security tests."""
+"""Verify public input and output guardrails at the inference boundary.
+
+Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import pytest
 from security.input_guard import InputGuard

@@ -1,4 +1,7 @@
-"""Video catalog / real content index tests."""
+"""Verify local media discovery, metadata extraction, and catalog search.
+
+Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import pytest
 

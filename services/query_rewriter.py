@@ -1,4 +1,12 @@
-"""Query rewriting service."""
+"""Deterministic query expansion, decomposition, and filter extraction.
+
+The service normalizes common abbreviations, enriches known media concepts,
+separates compound requests, and derives territory, duration, and brand filters
+without sending user text to an external service.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import re
 from typing import Any

@@ -1,4 +1,7 @@
-"""Public README and diagram-contract tests."""
+"""Protect the public README, architecture diagrams, and documentation links.
+
+Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from __future__ import annotations
 

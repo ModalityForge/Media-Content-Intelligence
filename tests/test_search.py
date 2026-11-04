@@ -1,4 +1,7 @@
-"""Search tests."""
+"""Verify query-aware retrieval and ranking through the public search API.
+
+Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import pytest
 import httpx

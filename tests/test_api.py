@@ -1,4 +1,7 @@
-"""API tests."""
+"""Exercise the public FastAPI endpoints through an in-process ASGI client.
+
+Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import pytest
 import httpx

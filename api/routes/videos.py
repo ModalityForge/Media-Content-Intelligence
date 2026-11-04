@@ -1,4 +1,12 @@
-"""Video preview endpoints for the frontend inset player."""
+"""Serve exact authorized local assets selected by catalog search.
+
+The endpoint resolves only catalogued identifiers, validates byte ranges, and
+returns explicit 404/416 failures instead of substituting an unrelated video.
+It supports browser seeking while keeping reads bounded to the requested range.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import mimetypes
 import os

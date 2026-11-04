@@ -1,4 +1,12 @@
-"""A2A Protocol for agent communication."""
+"""Typed in-process task boundary between the two public MCI agents.
+
+Messages, task state, and results are represented explicitly so orchestration
+decisions remain serializable and traceable. The helper accepts synchronous or
+asynchronous validator handlers and converts failures into structured results.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import inspect
 import uuid
@@ -9,7 +17,7 @@ from typing import Any, Callable
 
 @dataclass
 class A2AMessage:
-    """A2A Message."""
+    """Serializable envelope sent from one named agent to another."""
 
     message_id: str
     from_agent: str
@@ -19,6 +27,7 @@ class A2AMessage:
     message_type: str = "task"
 
     def to_dict(self) -> dict[str, Any]:
+        """Convert the message to JSON-compatible primitives for tracing."""
         return {
             "message_id": self.message_id,
             "from_agent": self.from_agent,
@@ -31,7 +40,7 @@ class A2AMessage:
 
 @dataclass
 class A2ATask:
-    """A2A Task."""
+    """Execution record derived from an incoming agent-to-agent message."""
 
     task_id: str
     agent_name: str
@@ -40,6 +49,7 @@ class A2ATask:
     status: str = "pending"
 
     def to_dict(self) -> dict[str, Any]:
+        """Convert the task state to JSON-compatible primitives."""
         return {
             "task_id": self.task_id,
             "agent_name": self.agent_name,
@@ -51,7 +61,7 @@ class A2ATask:
 
 @dataclass
 class A2AResult:
-    """A2A Result."""
+    """Completed or failed outcome returned across the agent boundary."""
 
     task_id: str
     status: str
@@ -60,6 +70,7 @@ class A2AResult:
     error: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
+        """Convert the result and optional error to serializable values."""
         return {
             "task_id": self.task_id,
             "status": self.status,

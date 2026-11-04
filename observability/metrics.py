@@ -1,4 +1,12 @@
-"""Prometheus metrics."""
+"""Prometheus instruments describing the public MCI execution path.
+
+Counters, histograms, and gauges capture agent tasks, tool calls, retrieval,
+validation, guardrails, cache behaviour, and active work. Application startup
+invokes :func:`init_metrics` as an explicit extension hook.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from prometheus_client import Counter, Histogram, Gauge
 
@@ -43,5 +51,5 @@ ACTIVE_JOBS = Gauge(
 )
 
 def init_metrics():
-    """Initialize metrics."""
+    """Provide an explicit, idempotent application-startup metrics hook."""
     pass

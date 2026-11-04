@@ -1,4 +1,12 @@
-"""Search endpoints."""
+"""Natural-language catalog search endpoints for the public MCI API.
+
+Requests are delegated to the media orchestrator, converted into validated
+response schemas, and returned with a trace identifier and measured latency.
+The route exposes deterministic metadata inference rather than mock detections.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import time
 import uuid

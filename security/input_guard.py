@@ -1,4 +1,12 @@
-"""Input guard - protects against prompt injection and malicious inputs."""
+"""Deterministic prompt-injection checks for public search requests.
+
+The guard rejects empty text and a conservative set of instruction-override
+patterns before an agent consumes a query. It also provides a sanitized form
+and structured validation reason for callers that need audit-friendly output.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import re
 from typing import Any
@@ -18,6 +26,7 @@ class InputGuard:
     ]
 
     def __init__(self):
+        """Compile blocked prompt-injection expressions once for repeated queries."""
         self.blocked_patterns = [re.compile(p, re.IGNORECASE) for p in self.BLOCKED_PATTERNS]
 
     def is_safe(self, query: str) -> bool:

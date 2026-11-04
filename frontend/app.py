@@ -1,4 +1,12 @@
-"""Streamlit frontend application."""
+"""Interactive Streamlit client for the public MCI search API.
+
+The page submits natural-language queries, summarizes latency and result count,
+shows provenance and dataset annotations, embeds exact catalog video previews,
+and records relevance feedback through the local FastAPI service.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import streamlit as st
 import httpx
@@ -13,7 +21,7 @@ st.title("MCI-v2.0: Media Content Intelligence")
 
 
 def search_clips(query: str, max_results: int = 10):
-    """Search for clips."""
+    """Submit a bounded search and render transport failures for the user."""
     try:
         response = httpx.post(
             f"{API_BASE}/search",

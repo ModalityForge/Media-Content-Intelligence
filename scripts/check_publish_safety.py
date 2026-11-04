@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Reject tracked datasets, media, pretrained models, and large artifacts."""
+"""Reject unsafe artifacts before the public repository is published.
+
+The command inspects Git-tracked paths—not merely working-tree files—and fails
+when it finds dataset directories, media, archives, model artifacts, embeddings,
+evaluation records, or files above the configured public size threshold.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from __future__ import annotations
 
@@ -38,6 +46,7 @@ BANNED_SUFFIXES = {
 
 
 def tracked_files() -> list[str]:
+    """Return every path recorded in the Git index using NUL-safe decoding."""
     result = subprocess.run(
         ["git", "ls-files", "-z"],
         cwd=PROJECT_ROOT,
@@ -48,6 +57,7 @@ def tracked_files() -> list[str]:
 
 
 def violations(paths: list[str]) -> list[str]:
+    """Return human-readable publication-policy violations for tracked paths."""
     problems: list[str] = []
     for relative in paths:
         normalized = PurePosixPath(relative).as_posix()
@@ -66,6 +76,7 @@ def violations(paths: list[str]) -> list[str]:
 
 
 def main() -> int:
+    """Print the safety verdict and return a shell-compatible process status."""
     problems = violations(tracked_files())
     if problems:
         print("Publication safety check failed:", file=sys.stderr)

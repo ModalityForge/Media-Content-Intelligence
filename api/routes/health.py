@@ -1,4 +1,12 @@
-"""Health check endpoints."""
+"""Liveness, readiness, and aggregate health endpoints for MCI.
+
+The responses provide stable deployment probes and an explicit view of the
+public runtime components without attempting to claim unavailable private
+databases, model servers, or external infrastructure.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 from datetime import datetime, timezone
 

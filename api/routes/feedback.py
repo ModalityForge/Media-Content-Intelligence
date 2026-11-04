@@ -1,4 +1,12 @@
-"""Feedback endpoints."""
+"""In-memory relevance-feedback endpoints for the public demonstration API.
+
+The routes accept user judgements about returned clips and expose simple
+aggregate counts. Persistence is intentionally outside this public smoke
+runtime, so callers must not treat records as durable across restarts.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import uuid
 from datetime import datetime, timezone

@@ -1,4 +1,7 @@
-"""Agent tests."""
+"""Verify the public orchestration and evidence-validation agent contracts.
+
+Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import pytest
 from agents.media_orchestrator import MediaOrchestratorAgent

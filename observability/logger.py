@@ -1,4 +1,12 @@
-"""Structured logging with structlog."""
+"""Configure and expose structured logging for public MCI components.
+
+The module selects human-readable console output for local development and
+JSON rendering for non-local environments, while preserving keyword context
+such as trace identifiers, tool names, candidate counts, and latency.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import logging
 import sys
@@ -35,4 +43,5 @@ class LoggerMixin:
 
     @property
     def logger(self) -> structlog.BoundLogger:
+        """Return a logger bound to the concrete class name of the caller."""
         return get_logger(self.__class__.__name__)

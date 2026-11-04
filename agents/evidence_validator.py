@@ -1,4 +1,12 @@
-"""Evidence Validator Agent."""
+"""Deterministic evidence and rights validator for candidate media.
+
+The validator checks only evidence present in the supplied bundle. Missing
+talent, action, logo, or rights evidence fails safely and triggers human review;
+the agent never invents model detections or treats unknown rights as clearance.
+
+Author:
+    Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+"""
 
 import re
 from typing import Any
@@ -13,6 +21,7 @@ class EvidenceValidatorAgent:
     """Validates evidence for clips."""
 
     def __init__(self):
+        """Assign the stable agent name used in traces and A2A records."""
         self.name = "evidence_validator"
 
     def validate(
