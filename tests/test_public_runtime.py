@@ -134,8 +134,17 @@ def test_runtime_boundary_files_identify_the_author() -> None:
 
 
 def test_every_public_runtime_symbol_is_documented_and_attributed() -> None:
-    """Retained modules and their symbols explain ownership and behaviour."""
-    for relative_path in PUBLIC_RUNTIME_FILES:
+    """Every tracked Python module and symbol explains ownership and behaviour."""
+    tracked_python_files = {
+        path
+        for path in subprocess.check_output(
+            ["git", "ls-files"], cwd=PROJECT_ROOT, text=True
+        ).splitlines()
+        if path.endswith(".py")
+    }
+    assert set(PUBLIC_RUNTIME_FILES) <= tracked_python_files
+
+    for relative_path in sorted(tracked_python_files):
         source = (PROJECT_ROOT / relative_path).read_text(encoding="utf-8")
         tree = ast.parse(source, filename=relative_path)
         module_docstring = ast.get_docstring(tree) or ""

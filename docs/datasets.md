@@ -1,117 +1,68 @@
-# Dataset Inventory and Annotation Guide
+# Public Data and Annotation Contract
 
-Dataset binaries are local working assets, not repository content. The `.gitignore` excludes raw, processed, indexed, and restricted data.
+Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
 
-## Local layout
+The public repository ships no dataset, downloaded media, model, embedding, or
+dataset-acquisition script. Users provide media they are permitted to process,
+and all resulting files remain under the ignored local `data/` boundary.
+
+## Minimal smoke dataset
+
+For a reproducible local demonstration, place a few short videos beneath
+`data/`, for example:
 
 ```text
-data/
-├── raw/
-│   └── ad_subset/                       Advertisement media subset
-└── restricted/
-    └── social_media_influencer/
-        ├── catalog.json                 Cross-dataset inventory
-        ├── manual_drop/                 Licensed manual archives, if any
-        └── datasets/
-            ├── microlens_50k/
-            │   ├── raw/videos/
-            │   ├── raw/metadata/
-            │   ├── virality_metrics.csv
-            │   ├── annotations_index.json
-            │   ├── annotation_assets.json
-            │   └── DATASET_INFO.md
-            └── snapugc/
-                ├── raw/videos/
-                ├── raw/metadata/
-                ├── virality_metrics.csv
-                ├── annotations_index.json
-                ├── annotation_assets.json
-                ├── failed_downloads.json
-                └── DATASET_INFO.md
+data/raw/smoke/
+├── coffee-commercial.mp4
+├── running-shoe-social-ad.mp4
+└── football-highlight.webm
 ```
 
-## Current local inventory
+The catalog recursively discovers MP4, WebM, MOV, MKV, and AVI files. It derives
+a stable identifier, title tokens, basic file metadata, and a playable local
+path. Descriptive filenames provide useful search signals when no sidecar
+annotation exists.
 
-| Dataset | Local items | Approximate size | Joined annotations | Intended project use |
-|---|---:|---:|---|---|
-| Advertisement subset | 63 local files | 109 MiB | Source-dependent manifests | Ad/logo/OCR/creative-content experiments |
-| MicroLens-50K subset | 100 videos | 254.1 MiB cataloged | `likes`, `views`, `title`, source archive member, hashes | Popularity priors, semantic retrieval, multimodal indexing |
-| SnapUGC subset | 30 videos | 59.5 MiB cataloged | `ecr`, optional `title`/`description`, split, source URL, hashes | Five-second retention/engagement prediction and short-video retrieval |
+## Candidate annotation model
 
-The complete social-media directory occupies approximately 331 MB in decimal units. Exact current values are recorded in `data/restricted/social_media_influencer/catalog.json`.
+The search response can carry the following annotation families:
 
-## Annotation semantics
+| Field family | Examples | Project use |
+|---|---|---|
+| Identity | `video_id`, dataset name, source URL, checksum | Provenance and deduplication |
+| Semantics | title, description, tags, caption, OCR text | Lexical and future multimodal retrieval |
+| Entities | people, brands, objects | Talent/brand constraints and evidence checks |
+| Actions | drinking, running, presenting | Intent matching and temporal verification |
+| Media | duration, resolution, file size, MIME type | Filtering and delivery |
+| Rights | territory, usage, expiry, licence state | Fail-safe review decisions |
+| Engagement | views, likes, continuation rate | Research features, never relevance truth by default |
 
-### MicroLens
+Missing evidence means “not verified,” not “verified absent.” In particular,
+filenames and text metadata cannot prove that a logo, person, or action is
+visually present.
 
-- `likes` and `views` are collection-time snapshots, not live counters.
-- `title` is textual content supplied by the published dataset.
-- `source_url`, `archive_member`, and `archive_disk` preserve provenance.
-- `sha256` verifies the locally extracted video.
-- Large user-video interaction pairs are optional via `--include-interactions` and are excluded from the compact subset by default.
+## Adding richer annotations
 
-Useful derived features include `log1p(views)`, `log1p(likes)`, `likes / max(views, 1)`, title embeddings, topic labels, OCR/title agreement, and content-versus-popularity evaluations.
+The public catalog is intentionally small and in-memory. Authorized users can
+extend `storage/video_catalog.py` to join their own JSON or database records,
+provided they preserve:
 
-### SnapUGC
+1. a stable `video_id`;
+2. a local playable path;
+3. source and licence provenance;
+4. a clear distinction between observed, predicted, and missing annotations;
+5. dataset-specific engagement semantics.
 
-- `ecr` is the published engagement continuation rate for training items.
-- `title` and `description` are sparse; blank values mean the source record did not provide them.
-- `split` identifies the source annotation split.
-- `source_url` is the publisher-provided CDN URL.
-- `failed_downloads.json` records stale or invalid media links so repeat runs can skip them.
-- The public CSVs inspected by the downloader do not expose NAWP labels, even though the paper describes NAWP as a metric.
+## Publication and rights boundary
 
-ECR can be used as a supervised regression target for opening-hook or first-five-second retention models. Do not combine it directly with MicroLens likes/views as if they were the same measurement.
+- Keep raw media, frames, audio, transcripts, OCR, embeddings, and indexes
+  beneath ignored local directories.
+- Do not redistribute third-party advertisements or creator videos without
+  permission.
+- Do not infer or publish sensitive personal attributes.
+- Review the source licence and platform terms for every user-supplied asset.
+- Run `python scripts/check_publish_safety.py` before every push.
 
-## Download commands
+The author's private dataset research and acquisition tooling remain local and
+are intentionally not reproducible from this public repository.
 
-MicroLens compact subset:
-
-```bash
-python scripts/download_socmed_dataset.py \
-  --datasets microlens \
-  --microlens-variant 50k \
-  --size-budget-mb 450 \
-  --max-videos 100 \
-  --max-file-mb 5 \
-  --accept-research-terms
-```
-
-SnapUGC compact subset:
-
-```bash
-python scripts/download_socmed_dataset.py \
-  --datasets snapugc \
-  --size-budget-mb 150 \
-  --max-videos 30 \
-  --max-file-mb 3 \
-  --accept-research-terms
-```
-
-Advertisement downloader options:
-
-```bash
-python scripts/download_ad_datasets.py --help
-```
-
-## Connecting data to MCI
-
-The downloaders prepare media and annotation manifests; they do not automatically populate the application indexes. A complete integration should:
-
-1. Register each `raw/videos/*` asset through `components/ingestion/`.
-2. Generate frames, audio, transcripts, OCR, and captions through `components/preprocessing/` and `components/indexing/`.
-3. Preserve the source `video_id` when writing metadata and vector indexes.
-4. Store engagement fields as metadata features, not as relevance ground truth.
-5. Split evaluation by creator, topic, or time when those identifiers are available to reduce leakage.
-6. Keep derived outputs outside the immutable `raw/` directory.
-
-## Rights and publication boundary
-
-MicroLens is academic-research-only and prohibits unauthorized modification or redistribution of its videos. SnapUGC is a published research dataset whose source media should likewise not be republished from this repository. Review each publisher’s current terms before use.
-
-Consequently:
-
-- Do not commit dataset videos, archives, generated catalogs containing restricted records, or derived media.
-- Do not publish creator identities or infer sensitive traits.
-- Keep checksums and provenance locally for auditability.
-- Commit processing code so authorized users can reproduce their own local subset.

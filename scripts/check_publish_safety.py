@@ -44,6 +44,64 @@ BANNED_SUFFIXES = {
     ".tar", ".tflite", ".tgz", ".tsv", ".wav", ".webm", ".zip",
 }
 
+# These paths are intentionally retained only in the author's local working
+# copy. They contain broader research, ingestion, evaluation, and operational
+# implementations that are not required by the reproducible public app.
+LOCAL_ONLY_PREFIXES = (
+    "api/middleware/",
+    "components/",
+    "docs/superpowers/",
+    "evaluation/",
+    "frontend/pages/",
+    "prompts/",
+    "streaming/",
+)
+LOCAL_ONLY_PATHS = {
+    "CLAUDE.md",
+    "agents/graph.py",
+    "agents/prompts.py",
+    "api/routes/alerts.py",
+    "api/routes/clips.py",
+    "api/routes/ingest.py",
+    "app/models.py",
+    "observability/cost_tracker.py",
+    "observability/trace.py",
+    "scripts/create_golden_dataset.py",
+    "scripts/download_ad_datasets.py",
+    "scripts/download_socmed_dataset.py",
+    "scripts/index_archive.py",
+    "scripts/migrate.py",
+    "scripts/run_live_stream.py",
+    "scripts/seed.py",
+    "security/audit_logger.py",
+    "security/content_filter.py",
+    "security/pii_filter.py",
+    "security/policy_rules.py",
+    "services/alert_service.py",
+    "services/brand_safety_service.py",
+    "services/feedback_service.py",
+    "services/notification_service.py",
+    "services/rag_pipeline.py",
+    "services/rights_service.py",
+    "services/semantic_cache.py",
+    "storage/metadata_db.py",
+    "storage/object_store.py",
+    "storage/redis_cache.py",
+    "storage/vector_db.py",
+    "tests/test_brand_safety.py",
+    "tests/test_cache.py",
+    "tests/test_ingestion.py",
+    "tests/test_preprocessing.py",
+    "tests/test_retrieval.py",
+    "tests/test_rights.py",
+    "tests/test_tools.py",
+    "tools/audio_ocr_tools.py",
+    "tools/output_tools.py",
+    "tools/policy_tools.py",
+    "tools/tool_schemas.py",
+    "tools/vision_tools.py",
+}
+
 
 def tracked_files() -> list[str]:
     """Return every path recorded in the Git index using NUL-safe decoding."""
@@ -62,7 +120,9 @@ def violations(paths: list[str]) -> list[str]:
     for relative in paths:
         normalized = PurePosixPath(relative).as_posix()
         suffix = PurePosixPath(normalized).suffix.lower()
-        if normalized in BANNED_PATHS:
+        if normalized in LOCAL_ONLY_PATHS or normalized.startswith(LOCAL_ONLY_PREFIXES):
+            problems.append(f"local-only implementation is tracked: {normalized}")
+        elif normalized in BANNED_PATHS:
             problems.append(f"dataset fixture is tracked: {normalized}")
         elif normalized.startswith(BANNED_PREFIXES):
             problems.append(f"banned artifact directory is tracked: {normalized}")

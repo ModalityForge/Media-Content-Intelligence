@@ -10,6 +10,7 @@ from app.main import app
 
 
 async def search(payload: dict):
+    """Submit a search payload directly to the in-process FastAPI application."""
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         return await client.post("/search", json=payload)
@@ -35,12 +36,14 @@ async def test_search_query_parsing():
 
 
 async def test_search_does_not_return_unrelated_video():
+    """A query with no supported candidate returns an empty result set."""
     response = await search({"query": "Messi drinking Pepsi"})
     assert response.status_code == 200
     assert response.json()["candidate_clips"] == []
 
 
 async def test_social_search_returns_annotated_video():
+    """Social-video annotations participate in deterministic query matching."""
     response = await search({"query": "LeBron guard Steph"})
     assert response.status_code == 200
     clip = response.json()["candidate_clips"][0]

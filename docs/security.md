@@ -1,48 +1,48 @@
-# Security Guide
+# Public Security Guide
 
-## Security Layers
+Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
 
-### 1. Input Guardrails
-- **Location**: `security/input_guard.py`
-- **Purpose**: Reject prompt injection, empty queries
-- **Blocked patterns**:
-  - "ignore previous instructions"
-  - "disregard your rules"
-  - "forget everything"
+## Runtime guardrails
 
-### 2. Output Guardrails
-- **Location**: `security/output_guard.py`
-- **Purpose**: Filter restricted fields (passwords, API keys)
-- **Action**: Redact sensitive fields
+### Input guard
 
-### 3. Rights Filtering
-- **Location**: `services/rights_service.py`
-- **Purpose**: Enforce territory/usage/duration limits
-- **Example**: Germany digital highlights limited to 30 seconds
+`security/input_guard.py` rejects empty input and known instruction-injection
+patterns before orchestration.
 
-### 4. Brand Safety
-- **Location**: `services/brand_safety_service.py`
-- **Purpose**: Check prohibited/excluded brands
-- **Configuration**: Prohibited brands list, excluded content tags
+### Output guard
 
-### 5. PII Filtering
-- **Location**: `security/pii_filter.py`
-- **Purpose**: Redact emails, phone numbers, SSNs
+`security/output_guard.py` blocks restricted keys such as passwords and API
+keys from crossing the response boundary.
 
-### 6. Audit Logging
-- **Location**: `security/audit_logger.py`
-- **Purpose**: Log all security-relevant events
-- **Output**: `logs/audit.log`
+### Evidence policy
 
-## Face Blur
+The Evidence Validator reports uncertainty and requests human review when a
+requested entity, action, exclusion, or right is not supported by available
+annotations. This public implementation does not constitute a legal rights
+clearance system.
 
-To enable face blurring for privacy:
-1. Use `tools/output_tools.FaceBlurTool`
-2. Configure blur intensity (0.0-1.0)
-3. Apply to exported clips
+## Traceability
 
-## Compliance
+Every HTTP response receives an `X-Trace-ID`. Structured logging and
+Prometheus metrics support local diagnosis without publishing media.
 
-- All rights decisions are auditable
-- All agent decisions are traceable via trace_id
-- Query/response pairs logged for compliance
+## Repository security
+
+`scripts/check_publish_safety.py` inspects the Git index and fails when it
+finds:
+
+- datasets, media, archives, embeddings, or model artifacts;
+- files larger than 10 MiB;
+- `CLAUDE.md` or any path declared local-only;
+- private research, ingestion, evaluation, or operational modules.
+
+The same check runs from the versioned pre-push hook. Ignored local files remain
+on the author's machine but are absent from clones and GitHub downloads.
+
+## Deployment boundary
+
+The API currently runs on localhost and will be externally exposed soon.
+External exposure requires authentication, TLS, rate limiting, access policy,
+durable audit events, secret management, and deployment-specific threat
+modelling. These controls are not represented as complete in the public build.
+

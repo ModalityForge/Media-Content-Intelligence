@@ -10,11 +10,13 @@ from agents.evidence_validator import EvidenceValidatorAgent
 
 @pytest.fixture
 def orchestrator():
+    """Return a fresh public orchestrator for each isolated agent test."""
     return MediaOrchestratorAgent()
 
 
 @pytest.fixture
 def validator():
+    """Return a fresh deterministic evidence validator for each test."""
     return EvidenceValidatorAgent()
 
 

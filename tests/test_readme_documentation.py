@@ -37,6 +37,7 @@ DIAGRAMS = {
 
 @pytest.mark.parametrize(("name", "required_labels"), DIAGRAMS.items())
 def test_excalidraw_source_is_editable(name: str, required_labels: set[str]) -> None:
+    """Every architecture visual retains a valid editable Excalidraw source."""
     source_path = DIAGRAM_DIR / f"{name}.excalidraw"
 
     document = json.loads(source_path.read_text(encoding="utf-8"))
@@ -54,6 +55,7 @@ def test_excalidraw_source_is_editable(name: str, required_labels: set[str]) -> 
 
 @pytest.mark.parametrize(("name", "required_labels"), DIAGRAMS.items())
 def test_svg_export_is_accessible(name: str, required_labels: set[str]) -> None:
+    """Every rendered diagram exposes accessible labels and expected content."""
     svg_path = DIAGRAM_DIR / "rendered" / f"{name}.svg"
 
     root = ElementTree.parse(svg_path).getroot()
@@ -66,6 +68,7 @@ def test_svg_export_is_accessible(name: str, required_labels: set[str]) -> None:
 
 
 def test_readme_embeds_both_visual_explanations() -> None:
+    """The README balances its narrative with both architecture visuals."""
     readme = README_PATH.read_text(encoding="utf-8")
 
     assert "docs/diagrams/rendered/media-intelligence-workflow.svg" in readme
@@ -74,6 +77,7 @@ def test_readme_embeds_both_visual_explanations() -> None:
 
 
 def test_readme_explains_local_api_lifecycle_at_every_localhost_exposure() -> None:
+    """Every localhost reference states that external exposure is forthcoming."""
     lines = README_PATH.read_text(encoding="utf-8").splitlines()
     localhost_lines = [index for index, line in enumerate(lines) if "localhost" in line]
 
@@ -83,23 +87,20 @@ def test_readme_explains_local_api_lifecycle_at_every_localhost_exposure() -> No
         assert "externally exposed soon" in context
 
 
-def test_readme_links_release_demos_without_publishing_restricted_media() -> None:
+def test_readme_does_not_advertise_unpublished_demo_assets() -> None:
+    """Pending release videos must not be represented by broken public links."""
     readme = " ".join(README_PATH.read_text(encoding="utf-8").split())
-    release_base = (
-        "https://github.com/ModalityForge/Media-Content-Intelligence/"
-        "releases/download/demo-assets-v1/"
-    )
 
-    assert release_base + "mci-search-demo.mp4" in readme
-    assert release_base + "mci-api-governance-demo.mp4" in readme
-    assert "original product walkthrough" in readme.lower()
+    assert "releases/download/demo-assets-v1" not in readme
+    assert "release publication is pending" in readme.lower()
     assert "restricted dataset videos" in readme.lower()
-    assert "never included in git or release assets" in readme.lower()
+    assert "will never be included in git or release assets" in readme.lower()
 
 
 def test_readme_states_current_implementation_boundary() -> None:
+    """The README distinguishes the runnable demo from future production ML."""
     readme = " ".join(README_PATH.read_text(encoding="utf-8").lower().split())
 
-    assert "mock-first reference implementation" in readme
-    assert "deterministic metadata" in readme
+    assert "mock-first reference application" in readme
+    assert "deterministic ranking" in readme
     assert "does not yet run production multimodal inference" in readme

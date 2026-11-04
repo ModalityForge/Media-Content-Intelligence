@@ -7,7 +7,6 @@ import pytest
 import httpx
 
 from app.main import app
-from storage.video_catalog import catalog
 
 
 async def request(method: str, path: str, **kwargs):
@@ -26,7 +25,7 @@ async def test_health_endpoint():
 
 
 async def test_root_endpoint():
-    """Test root endpoint."""
+    """The service root identifies a running public API process."""
     response = await request("GET", "/")
     assert response.status_code == 200
 
@@ -37,9 +36,9 @@ async def test_metrics_endpoint():
     assert response.status_code == 200
 
 
-async def test_video_preview_endpoint_returns_exact_catalog_video():
+async def test_video_preview_endpoint_returns_exact_catalog_video(smoke_catalog):
     """A catalog id streams its own file, not a hashed fallback video."""
-    record = next(record for record in catalog.records if record.is_playable())
+    record = next(record for record in smoke_catalog.records if record.is_playable())
     response = await request("GET", f"/videos/{record.video_id}")
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("video/")
@@ -48,12 +47,14 @@ async def test_video_preview_endpoint_returns_exact_catalog_video():
 
 
 async def test_unknown_video_id_returns_404():
+    """An unknown catalog identifier must fail instead of serving fallback media."""
     response = await request("GET", "/videos/video-does-not-exist")
     assert response.status_code == 404
 
 
-async def test_video_preview_supports_byte_ranges():
-    record = next(record for record in catalog.records if record.is_playable())
+async def test_video_preview_supports_byte_ranges(smoke_catalog):
+    """The video endpoint supports browser-compatible partial-content requests."""
+    record = next(record for record in smoke_catalog.records if record.is_playable())
     response = await request(
         "GET",
         f"/videos/{record.video_id}",

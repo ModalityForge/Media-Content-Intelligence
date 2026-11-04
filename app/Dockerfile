@@ -1,3 +1,5 @@
+# Minimal public inference API image.
+# Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
 FROM python:3.11-slim
 
 WORKDIR /app

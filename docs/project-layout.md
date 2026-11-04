@@ -1,113 +1,102 @@
-# Project Layout, Entry Points, and Outputs
+# Public Project Layout, Entry Points, and Outputs
 
-This document maps the repository as it is implemented. “Output” means either an HTTP response, a generated artifact, or a process exit status.
+Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
 
-## Repository layout
+This document describes the files present in a fresh public clone. The author's
+extended research implementation is intentionally local-only and is not part of
+this contract.
+
+## Tracked runtime layout
 
 ```text
-media-content-intelligence-mci-v2/
-├── app/
-│   ├── main.py                 FastAPI application and process entry point
-│   ├── config.py               Environment-backed settings
-│   ├── schemas.py              API request/response contracts
-│   └── models.py               Internal media domain models
-├── api/
-│   ├── middleware/             Authentication, rate limits, request context
-│   └── routes/                 Health, ingest, search, clips, alerts, feedback
-├── agents/
-│   ├── media_orchestrator.py   Main query-planning and tool-dispatch agent
-│   ├── evidence_validator.py   Candidate-evidence validation agent
-│   ├── a2a_protocol.py         Orchestrator-to-validator task boundary
-│   ├── graph.py                Lightweight sequential orchestration graph
-│   └── state.py                Shared execution state
-├── tools/                      MCP-style tool registry and tool bundles
-├── services/                   RAG, policy, safety, alert and feedback services
-├── components/
-│   ├── ingestion/              Video/stream/metadata loading and job registry
-│   ├── preprocessing/          Scenes, frames, audio, OCR, transcripts
-│   ├── indexing/               Text/visual embeddings, captions and metadata
-│   ├── retrieval/              Vector/BM25 search, RRF, reranking, rights filter
-│   ├── vision/                 Detection, segmentation, tracking and pose
-│   └── clipping/               Clip, thumbnail and export helpers
-├── storage/                    Object, metadata, vector and Redis adapters
-├── security/                   Guards, PII/content filters and audit logging
-├── streaming/                  Kafka/Flink/live-window integration points
-├── observability/              Logs, traces, metrics and cost tracking
-├── frontend/                   Streamlit application and review pages
-├── prompts/                    Agent and policy prompt templates
-├── evaluation/                 Golden fixture and evaluator modules
-├── scripts/                    Dataset and operational command-line entries
-├── docs/                       Project and subsystem documentation
-├── tests/                      Pytest suite
-└── data/                       Local-only source and generated data
+Media-Content-Intelligence/
+├── app/                       FastAPI assembly, settings, schemas, dependencies
+├── api/routes/                Health, search, video, and feedback routes
+├── agents/                    Orchestrator, validator, shared state, A2A messages
+├── tools/                     Retrieval contracts, implementations, registry
+├── services/                  Query rewriting and HyDE text generation
+├── storage/video_catalog.py   Local media discovery and deterministic search
+├── security/                  Input and output boundary guards
+├── observability/             Structured logging and Prometheus metrics
+├── frontend/app.py            Streamlit application
+├── scripts/                   Health probe and publication-safety check
+├── docs/                      Public architecture and operating documentation
+└── tests/                     Focused public-runtime contract tests
 ```
 
 ## Runtime flow
 
 ```text
-Client or Streamlit
+User or Streamlit
   -> FastAPI route
+  -> input guard
   -> MediaOrchestratorAgent
-  -> query rewrite + HyDE + tool plan
-  -> MCP tool registry
-  -> retrieval / vision / policy tools
-  -> EvidenceValidatorAgent over A2A boundary
-  -> output guardrails
+  -> query rewrite + HyDE
+  -> vector_search + bm25_search
+  -> rrf_fusion
+  -> EvidenceValidatorAgent
+  -> output guard
   -> SearchResponse JSON
 ```
 
-The default tool/model implementations are lightweight or mocked. The repository demonstrates contracts and orchestration; it does not yet run the complete ingestion/indexing stack against the downloaded datasets automatically.
+The public retrieval path is deterministic and operates on the in-memory
+catalog built from ignored local media. The “vector” tool is a lightweight
+metadata scorer in this edition; it is an integration boundary for a future
+embedding-backed index.
 
-## Service entry and exit points
+## Service entries and exits
 
-| Entry | Invocation | Successful exit/output |
+All APIs currently run on localhost and will be externally exposed soon after
+authentication and deployment controls are added.
+
+| Entry | Invocation | Successful output |
 |---|---|---|
-| API process | `uvicorn app.main:app --reload` or `python -m app.main` | HTTP service on port 8000 |
-| Frontend process | `streamlit run frontend/app.py` | Streamlit UI on port 8501; API base defaults to `http://localhost:8000` |
-| Container stack | `docker compose up --build` | API plus Redis; local `data/` and `logs/` mounts |
-| Root API | `GET /` | Service name, version and running status |
-| Health APIs | `GET /health`, `/health/ready`, `/health/live` | `HealthResponse` JSON |
-| Search API | `POST /search` | Rewritten query, HyDE text, candidate clips, trace ID and latency |
+| API process | `uvicorn app.main:app --reload` | HTTP service on localhost port 8000 |
+| Frontend process | `streamlit run frontend/app.py` | UI on localhost port 8501 |
+| Root API | `GET /` | Service identity and status |
+| Health APIs | `GET /health`, `/health/ready`, `/health/live` | Structured health JSON |
+| Search API | `POST /search` | Query variants, candidates, validation, trace ID, latency |
 | Suggestions API | `GET /search/suggestions?q=...` | Suggested query strings |
-| Ingest API | `POST /ingest/video` | Queued job identifier; background processing is currently a placeholder |
-| Ingest job APIs | `GET` or `DELETE /ingest/job/{job_id}` | Mock job status or cancellation response |
-| Clip APIs | `/clips/export`, `/clips/{clip_id}` | Export/status metadata; current implementation is mock-first |
-| Alert APIs | `/alerts` | In-memory alert records |
-| Feedback APIs | `/feedback` | In-memory feedback records and statistics |
+| Video API | `GET /videos/{video_id}` | Exact authorized local asset |
+| Feedback API | `POST /feedback` | In-memory acknowledgement |
 | Metrics API | `GET /metrics` | Prometheus text exposition |
 
-Every API response receives an `X-Trace-ID` header from `app/main.py` middleware.
+Every response receives an `X-Trace-ID` header from `app/main.py`.
 
-## Command-line entry and exit points
+## Command-line entries and exits
 
-| Script | Purpose | Output / exit behavior |
+| Script | Purpose | Exit behavior |
 |---|---|---|
-| `scripts/download_ad_datasets.py` | Build a capped advertisement-media subset | Dataset files, manifest/catalog and exit `0`; validation/configuration errors return non-zero |
-| `scripts/download_socmed_dataset.py` | Build capped MicroLens/SnapUGC subsets | `data/restricted/social_media_influencer/`, catalogs and joined CSVs; exit `0`, `2` for bad arguments, `130` on interruption |
-| `scripts/create_golden_dataset.py` | Regenerate evaluation fixture | Writes `evaluation/golden_dataset.json` |
-| `scripts/healthcheck.py` | Test API health | Exit `0` when healthy, `1` on failure |
-| `scripts/index_archive.py` | Archive-indexing integration point | Prints mock completion; currently not a production indexer |
-| `scripts/run_live_stream.py` | Live-stream integration point | Prints mock completion; currently not a stream processor |
-| `scripts/seed.py` | Seed-development integration point | Prints sample records; no persistent database write yet |
-| `scripts/migrate.py` | Migration integration point | Prints placeholder result; no migration framework wired yet |
+| `scripts/healthcheck.py` | Probe the localhost health endpoint | `0` when healthy, `1` on failure |
+| `scripts/check_publish_safety.py` | Inspect Git-tracked paths | `0` only for an approved code/documentation surface |
 
-## Generated-data exits
+## Local data boundary
+
+The application scans `data/` for user-supplied media. The entire directory is
+ignored. A typical smoke-test layout is:
 
 ```text
 data/
-├── raw/                         Source media; advertisement subset lives here
-├── restricted/                  Research-only/non-redistributable media
-├── processed/                   Normalized media and metadata
-├── frames/                      Extracted frames
-├── audio/                       Extracted audio
-├── transcripts/                 ASR output
-├── ocr/                         OCR output
-├── captions/                    Generated captions
-└── indexes/                     Retrieval indexes and embeddings
+└── raw/
+    └── smoke/
+        ├── coffee-commercial.mp4
+        └── sports-highlight.webm
 ```
 
-All generated-data directories are ignored by Git. Only downloader code, schemas, and documentation belong in the repository.
+No media, annotation export, model, embedding, archive, or generated catalog is
+tracked.
+
+## Local-only implementation
+
+The working tree may contain ignored acquisition, ingestion, preprocessing,
+vision, streaming, evaluation, and persistence code. Those files are not
+required to run this public application, are absent from a clone, and are
+rejected by the publication-safety check if accidentally staged.
+
+`CLAUDE.md` is explicitly local-only and is not part of the public project.
 
 ## Configuration boundary
 
-Settings are loaded by `app/config.py` from environment variables and an optional local `.env`. Important variables include `OPENAI_API_KEY`, `VECTOR_DB_URL`, `METADATA_DB_URL`, `REDIS_URL`, `OBJECT_STORE_PATH`, `ENABLE_MOCK_MODELS`, and `LOG_LEVEL`. Never commit `.env` or credentials.
+`app/config.py` reads environment variables and an optional ignored `.env`.
+Use `.env.example` as the non-secret template. Never commit credentials.
+

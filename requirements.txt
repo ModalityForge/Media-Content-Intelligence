@@ -1,37 +1,14 @@
+# Minimal public runtime and test dependencies.
+# Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
 fastapi>=0.109.0
 uvicorn[standard]>=0.27.0
 pydantic>=2.5.0
 pydantic-settings>=2.1.0
 python-dotenv>=1.0.0
-python-multipart>=0.0.6
-aiofiles>=23.2.1
 httpx>=0.26.0
-numpy>=1.26.0
-pandas>=2.2.0
-scikit-learn>=1.4.0
 rank-bm25>=0.2.2
 prometheus-client>=0.19.0
 structlog>=24.1.0
 pytest>=7.4.0
 pytest-asyncio>=0.23.0
 streamlit>=1.30.0
-python-json-logger>=2.0.0
-
-# Optional dependencies (uncomment to enable)
-# langgraph>=0.1.0
-# langchain>=0.1.0
-# langchain-openai>=0.0.5
-# openai>=1.10.0
-
-# Heavy ML models (mocked by default for local development)
-# torch>=2.1.0
-# torchvision>=0.16.0
-# transformers>=4.36.0
-# opencv-python>=4.9.0
-# ffmpeg-python>=0.2.0
-# faster-whisper>=0.10.0
-# easyocr>=1.7.0
-
-# Vector databases
-# qdrant-client>=1.7.0
-# chromadb>=0.4.0

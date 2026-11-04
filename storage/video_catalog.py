@@ -26,7 +26,7 @@ from rank_bm25 import BM25Okapi
 from app.config import settings
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
-_PLAYABLE_EXTS = {".mp4", ".webm", ".ogg", ".ogv", ".mov"}
+_PLAYABLE_EXTS = {".mp4", ".webm", ".ogg", ".ogv", ".mov", ".mkv", ".avi"}
 _BROWSER_PREVIEW_EXTS = {".mp4", ".webm", ".ogg", ".ogv"}
 _MIME_TYPES = {
     ".mp4": "video/mp4",
@@ -34,6 +34,8 @@ _MIME_TYPES = {
     ".ogg": "video/ogg",
     ".ogv": "video/ogg",
     ".mov": "video/quicktime",
+    ".mkv": "video/x-matroska",
+    ".avi": "video/x-msvideo",
 }
 
 # Words that describe a request rather than the requested scene or subject.
@@ -208,7 +210,48 @@ class VideoCatalog:
         """Discover advertisement and social-video records from configured roots."""
         self._load_advertisements()
         self._load_social_media()
+        self._load_local_media()
         self._build_index()
+
+    def _load_local_media(self) -> None:
+        """Recursively index user-supplied media not covered by a manifest.
+
+        This fallback makes a fresh public clone usable with a simple smoke
+        directory. Filename terms provide minimal, explicitly textual search
+        evidence; they are never presented as visual model predictions.
+        """
+        if not self.base_dir.is_dir():
+            return
+
+        for path in sorted(self.base_dir.rglob("*")):
+            if not path.is_file() or path.suffix.lower() not in _PLAYABLE_EXTS:
+                continue
+            if str(path.resolve()) in self._known_paths:
+                continue
+
+            title = self._title_from_filename(path.name)
+            terms = set(_tokenize(title))
+            if "advertisement" in terms:
+                content_type = "advertisement"
+            elif terms & {"influencer", "social", "ugc"}:
+                content_type = "social_media"
+            else:
+                content_type = "video"
+            relative_parent = path.parent.relative_to(self.base_dir)
+            dataset = "local" if not relative_parent.parts else relative_parent.name
+
+            self._add_record(
+                VideoRecord(
+                    video_id=f"local-{_slug(str(path.relative_to(self.base_dir)), 40)}",
+                    file_path=str(path.resolve()),
+                    title=title,
+                    source="local_user_media",
+                    asset_name=path.name,
+                    dataset=dataset,
+                    content_type=content_type,
+                    mime_type=_MIME_TYPES.get(path.suffix.lower()),
+                )
+            )
 
     def _load_advertisements(self) -> None:
         """Load manifest-backed ads without collapsing distinct variants."""
@@ -420,11 +463,12 @@ class VideoCatalog:
     @staticmethod
     def _build_display_text(record: VideoRecord) -> str:
         """Assemble weighted metadata without inventing visual evidence."""
-        tags = (
-            "advertisement commercial ad"
-            if record.content_type == "advertisement"
-            else "social media influencer short video user generated content ugc"
-        )
+        if record.content_type == "advertisement":
+            tags = "advertisement commercial ad"
+        elif record.content_type == "social_media":
+            tags = "social media influencer short video user generated content ugc"
+        else:
+            tags = "video media"
         return " ".join(
             value
             for value in (

@@ -1,3 +1,5 @@
 #!/bin/sh
+# Prevent private code, data, media, and model artifacts from being published.
+# Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
 set -eu
 python3 scripts/check_publish_safety.py

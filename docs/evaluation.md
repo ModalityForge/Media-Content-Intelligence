@@ -1,68 +1,44 @@
-# Evaluation Guide
+# Public Evaluation Guide
 
-## Golden Dataset
+Author: Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
 
-The golden dataset contains example media queries with expected intents and tool sequences.
+The public edition evaluates the application contract without publishing a
+private golden dataset, downloaded media, or the author's extended evaluation
+pipeline.
 
-Location: `evaluation/golden_dataset.json`
+## Included checks
 
-Example entry:
-```json
-{
-  "query": "Find 30-second clips where Messi is drinking from a Pepsi bottle...",
-  "expected_intent": {
-    "type": "search",
-    "talents": ["Messi"],
-    "brands": {"required": ["Adidas", "Pepsi"], "excluded": ["Nike"]},
-    "actions": ["drinking"],
-    "territory": "Germany",
-    "usage_type": "digital_highlights",
-    "duration": 30
-  },
-  "expected_tools": ["vector_search", "bm25_search", "logo_detection", "rights_check"]
-}
-```
+| Test area | Evidence |
+|---|---|
+| API | Routes, schemas, health, feedback, traceable search responses |
+| Retrieval | Query-sensitive ordering and deterministic local catalog results |
+| Agents | Orchestrator and evidence-validator state transitions |
+| Security | Input/output guard behavior and publication policy |
+| Documentation | Editable diagrams, rendered diagrams, README claims |
+| Public boundary | No import dependency on ignored private modules |
 
-## Evaluation Types
-
-### 1. Retrieval Evaluation
-- **Metric**: Precision@K
-- **Location**: `evaluation/retrieval_eval.py`
-
-### 2. Temporal Evaluation
-- **Metric**: Timestamp overlap
-- **Location**: `evaluation/temporal_eval.py`
-
-### 3. Brand Safety Evaluation
-- **Metric**: Pass rate
-- **Location**: `evaluation/brand_safety_eval.py`
-
-### 4. Rights Evaluation
-- **Metric**: Rights clearance rate
-- **Location**: `evaluation/rights_eval.py`
-
-### 5. Agent Trajectory Evaluation
-- **Metric**: Tool sequence correctness
-- **Location**: `evaluation/agent_trajectory_eval.py`
-
-## Running Evaluations
+Run the complete public suite with:
 
 ```bash
-# Run all offline evaluations
-python evaluation/offline_eval.py
-
-# Run specific evaluation
-python evaluation/retrieval_eval.py
-
-# Run online monitor
-python evaluation/online_monitor.py
+pytest
 ```
 
-## HITL Review
+## Smoke evaluation with user data
 
-When confidence is below threshold or critical criteria fail, clips are flagged for Human-In-The-Loop review.
+1. Add a few licensed, descriptively named videos under `data/raw/smoke/`.
+2. Start the API.
+3. issue queries that should match and queries that should not match.
+4. Confirm that rankings change with the query and point to real playable files.
+5. Inspect evidence-validation fields; absent annotations should require review.
 
-The EvidenceValidatorAgent determines when HITL is needed based on:
-- Overall confidence < 0.7
-- Critical criteria failures (rights, exclusion)
-- Ambiguous evidence
+Useful retrieval measures for a user-owned labelled set include Precision@K,
+Recall@K, mean reciprocal rank, and nDCG. Rights and evidence decisions should
+also be evaluated for false approvals, because a false approval is more severe
+than a conservative review request.
+
+## Private evaluation boundary
+
+Golden fixtures, research evaluators, online monitors, and dataset-specific
+benchmarks remain local-only. They are not required to run public inference and
+must not be inferred to exist in a fresh clone.
+

@@ -1,3 +1,6 @@
+# Public/private repository boundary maintained by:
+# Prosenjit Banerjee <prosenjit.banerjee@gmail.com>
+
 # Python
 __pycache__/
 *.py[cod]
@@ -119,3 +122,58 @@ htmlcov/
 
 # Prometheus
 prometheus_data/
+
+# Local-only research and extended implementation (never publish)
+CLAUDE.md
+agents/graph.py
+agents/prompts.py
+api/middleware/
+api/routes/alerts.py
+api/routes/clips.py
+api/routes/ingest.py
+app/models.py
+components/
+docs/superpowers/
+evaluation/
+frontend/pages/
+observability/cost_tracker.py
+observability/trace.py
+prompts/
+scripts/create_golden_dataset.py
+scripts/download_ad_datasets.py
+scripts/download_socmed_dataset.py
+scripts/index_archive.py
+scripts/migrate.py
+scripts/run_live_stream.py
+scripts/seed.py
+security/audit_logger.py
+security/content_filter.py
+security/pii_filter.py
+security/policy_rules.py
+services/alert_service.py
+services/brand_safety_service.py
+services/feedback_service.py
+services/notification_service.py
+services/rag_pipeline.py
+services/rights_service.py
+services/semantic_cache.py
+storage/metadata_db.py
+storage/object_store.py
+storage/redis_cache.py
+storage/vector_db.py
+streaming/
+tests/test_brand_safety.py
+tests/test_cache.py
+tests/test_ingestion.py
+tests/test_preprocessing.py
+tests/test_retrieval.py
+tests/test_rights.py
+tests/test_tools.py
+tools/audio_ocr_tools.py
+tools/output_tools.py
+tools/policy_tools.py
+tools/tool_schemas.py
+tools/vision_tools.py
+
+# Local IDE/agent configuration
+.opencode
