@@ -1,29 +1,103 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1450" height="720" viewBox="0 0 1450 720" role="img" aria-labelledby="title desc">
-  <title id="title">Search, evidence validation, governance, and human review flow</title>
-  <desc id="desc">A query moves through hybrid retrieval, evidence validation, and guardrails. Passed results become a search response while missing evidence or rights is routed to human review.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="search-title search-desc">
+  <title id="search-title">Explainable Search Decision Flow</title>
+  <desc id="search-desc">A natural-language query is parsed into intent and filters, then sent through parallel metadata and BM25 search paths. RRF rank fusion combines retrieval ranks before evidence assessment. A decision diamond asks whether evidence is sufficient. The Yes branch returns a ranked response with provenance and explanation. The No branch signals human review required for evidence gaps or uncertainty; rights remain unapproved. Retrieval relevance, evidence confidence, and rights status are separate signals. This mock-first reference application uses deterministic retrieval and does not run visual inference or grant rights approval.</desc>
   <defs>
-    <filter id="rough" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence baseFrequency="0.012" numOctaves="2" seed="13" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="1.1"/></filter>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker>
-    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#2b8a3e"/></marker>
-    <marker id="arrowOrange" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#e67700"/></marker>
-    <style>.heading{font:700 27px Inter,system-ui,sans-serif;fill:#0f172a}.sub{font:600 21px Inter,system-ui,sans-serif}.body{font:17px Inter,system-ui,sans-serif;fill:#334155}.small{font:15px Inter,system-ui,sans-serif;fill:#475569}.card{stroke-width:2.5;filter:url(#rough)}.flow{stroke:#64748b;stroke-width:3;fill:none;marker-end:url(#arrow)}</style>
+    <marker id="arrow-main" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L7 4 L1 7" fill="none" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrow-retrieval" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L7 4 L1 7" fill="none" stroke="#0D9488" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrow-evidence" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L7 4 L1 7" fill="none" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrow-review" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L7 4 L1 7" fill="none" stroke="#D97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
   </defs>
-  <rect width="1450" height="720" fill="#fcfcfd"/>
-  <text x="725" y="55" class="heading" text-anchor="middle">Relevance is retrieved; permission and evidence are validated</text>
-  <text x="725" y="86" class="small" text-anchor="middle">The fail-safe path makes uncertainty visible and reviewable</text>
-
-  <path d="M280 310 C305 301 325 319 350 310" class="flow"/><path d="M570 310 C595 301 615 319 640 310" class="flow"/><path d="M860 310 C885 301 905 319 930 310" class="flow"/>
-  <path d="M1130 310 C1155 301 1180 319 1210 310" stroke="#2b8a3e" stroke-width="3" fill="none" marker-end="url(#arrowGreen)"/>
-  <path d="M1030 400 C1040 438 1015 462 1030 500" stroke="#e67700" stroke-width="3" stroke-dasharray="8 7" fill="none" marker-end="url(#arrowOrange)"/>
-  <text x="1170" y="286" class="small" text-anchor="middle" fill="#2b8a3e">validated</text><text x="1085" y="460" class="small" fill="#e67700">missing / uncertain</text>
-
-  <g><rect x="70" y="250" width="210" height="120" rx="22" fill="#e7f5ff" stroke="#1e3a5f" class="card"/><text x="175" y="294" class="sub" text-anchor="middle" fill="#1e3a5f"><tspan x="175">Natural-language</tspan><tspan x="175" dy="27">query</tspan></text></g>
-  <g><rect x="350" y="220" width="220" height="180" rx="22" fill="#f3f0ff" stroke="#5f3dc4" class="card"/><text x="460" y="266" class="sub" text-anchor="middle" fill="#5f3dc4">Hybrid retrieval</text><text x="460" y="319" class="body" text-anchor="middle"><tspan x="460">Metadata + BM25</tspan><tspan x="460" dy="31">RRF fusion</tspan></text></g>
-  <g><rect x="640" y="220" width="220" height="180" rx="22" fill="#e3fafc" stroke="#0b7285" stroke-width="4" class="card"/><text x="750" y="266" class="sub" text-anchor="middle" fill="#0b7285">Evidence Validator</text><text x="750" y="319" class="body" text-anchor="middle"><tspan x="750">Evidence present?</tspan><tspan x="750" dy="31">Rights known?</tspan></text></g>
-  <g><rect x="930" y="220" width="200" height="180" rx="22" fill="#fff0f6" stroke="#c2255c" class="card"/><text x="1030" y="266" class="sub" text-anchor="middle" fill="#c2255c">Guardrails</text><text x="1030" y="319" class="body" text-anchor="middle"><tspan x="1030">Brand exclusions</tspan><tspan x="1030" dy="31">PII + content safety</tspan></text></g>
-  <g><rect x="1210" y="220" width="200" height="180" rx="22" fill="#ebfbee" stroke="#2b8a3e" class="card"/><text x="1310" y="266" class="sub" text-anchor="middle" fill="#2b8a3e">Search response</text><text x="1310" y="319" class="body" text-anchor="middle"><tspan x="1310">Ranked assets</tspan><tspan x="1310" dy="31">Traceable reasons</tspan></text></g>
-  <g><rect x="930" y="500" width="200" height="120" rx="22" fill="#fff4e6" stroke="#e67700" stroke-dasharray="8 7" class="card"/><text x="1030" y="551" class="sub" text-anchor="middle" fill="#e67700">Human review</text><text x="1030" y="582" class="small" text-anchor="middle">approve · reject · annotate</text></g>
-
-  <rect x="300" y="650" width="850" height="44" rx="15" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-  <text x="725" y="678" class="small" text-anchor="middle">No visual model inference is claimed when only metadata evidence exists; rights default to not cleared.</text>
+  <g font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="0" y="0" width="1600" height="900" fill="#F8FAFC"/>
+    <text x="64" y="57" font-size="17" font-weight="600" fill="#475569">MEDIA CONTENT INTELLIGENCE</text>
+    <text x="64" y="115" font-size="44" font-weight="700" fill="#0B1220">Explainable Search Decision Flow</text>
+    <text x="64" y="151" font-size="21" font-weight="400" fill="#475569">Hybrid retrieval with a visible evidence decision and a review path.</text>
+    <rect x="1206" y="43" width="330" height="42" rx="12" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="1371" y="70" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">Mock-first reference application</text>
+    <path d="M64 186 L1536 186" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="64" y="239" font-size="17" font-weight="600" fill="#0D9488">RETRIEVAL RELEVANCE</text>
+    <text x="64" y="272" font-size="20" font-weight="400" fill="#334155">Parallel signals, fused into one rank.</text>
+    <path d="M64 291 L848 291" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="872" y="239" font-size="17" font-weight="600" fill="#7C3AED">EVIDENCE CONFIDENCE + REVIEW</text>
+    <text x="872" y="272" font-size="20" font-weight="400" fill="#334155">Assess support; preserve rights status.</text>
+    <path d="M872 291 L1536 291" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
+    <path d="M280 448 L304 448" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-main)"/>
+    <path d="M460 448 L472 448" fill="none" stroke="#0D9488" stroke-width="2"/>
+    <path d="M472 448 L472 368 L484 368" fill="none" stroke="#0D9488" stroke-width="2" marker-end="url(#arrow-retrieval)"/>
+    <path d="M472 448 L472 544 L484 544" fill="none" stroke="#0D9488" stroke-width="2" marker-end="url(#arrow-retrieval)"/>
+    <path d="M664 368 L676 368 L676 448" fill="none" stroke="#0D9488" stroke-width="2"/>
+    <path d="M664 544 L676 544 L676 448" fill="none" stroke="#0D9488" stroke-width="2"/>
+    <path d="M676 448 L688 448" fill="none" stroke="#0D9488" stroke-width="2" marker-end="url(#arrow-retrieval)"/>
+    <path d="M848 448 L872 448" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-main)"/>
+    <path d="M1088 448 L1112 448" fill="none" stroke="#7C3AED" stroke-width="2" marker-end="url(#arrow-evidence)"/>
+    <path d="M1256 448 L1268 448 L1268 376 L1280 376" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow-main)"/>
+    <path d="M1184 520 L1184 576 L1280 576" fill="none" stroke="#D97706" stroke-width="2" marker-end="url(#arrow-review)"/>
+    <rect x="64" y="397" width="216" height="112" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="64" y="392" width="216" height="112" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="158" y="407" width="28" height="3" rx="1.5" fill="#2563EB"/>
+    <text x="172" y="443" font-size="17" font-weight="500" fill="#0B1220" text-anchor="middle">Natural-language query</text>
+    <text x="172" y="477" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">Search request</text>
+    <rect x="304" y="397" width="156" height="112" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="304" y="392" width="156" height="112" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="368" y="407" width="28" height="3" rx="1.5" fill="#2563EB"/>
+    <text x="382" y="443" font-size="17" font-weight="500" fill="#0B1220" text-anchor="middle">Intent + filters</text>
+    <text x="382" y="477" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">Parse request</text>
+    <rect x="484" y="325" width="180" height="96" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="484" y="320" width="180" height="96" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="560" y="335" width="28" height="3" rx="1.5" fill="#0D9488"/>
+    <text x="574" y="360" font-size="17" font-weight="500" fill="#0B1220" text-anchor="middle">Metadata search</text>
+    <text x="574" y="391" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">Fields + filters</text>
+    <rect x="484" y="501" width="180" height="96" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="484" y="496" width="180" height="96" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="560" y="511" width="28" height="3" rx="1.5" fill="#0D9488"/>
+    <text x="574" y="536" font-size="17" font-weight="500" fill="#0B1220" text-anchor="middle">BM25 search</text>
+    <text x="574" y="567" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">Lexical relevance</text>
+    <rect x="688" y="397" width="160" height="112" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="688" y="392" width="160" height="112" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="754" y="407" width="28" height="3" rx="1.5" fill="#0D9488"/>
+    <text x="768" y="443" font-size="17" font-weight="500" fill="#0B1220" text-anchor="middle">RRF rank fusion</text>
+    <text x="768" y="477" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">Combine ranks</text>
+    <rect x="872" y="397" width="216" height="112" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="872" y="392" width="216" height="112" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="966" y="407" width="28" height="3" rx="1.5" fill="#7C3AED"/>
+    <text x="980" y="443" font-size="17" font-weight="500" fill="#0B1220" text-anchor="middle">Evidence assessment</text>
+    <text x="980" y="477" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">Inspect support</text>
+    <text x="1184" y="344" font-size="17" font-weight="500" fill="#0B1220" text-anchor="middle">Evidence sufficient?</text>
+    <path d="M1112 448 L1184 376 L1256 448 L1184 520 Z" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2"/>
+    <text x="1184" y="459" font-size="30" font-weight="600" fill="#7C3AED" text-anchor="middle">?</text>
+    <text x="1238" y="361" font-size="17" font-weight="600" fill="#2563EB" text-anchor="middle">Yes</text>
+    <text x="1220" y="565" font-size="17" font-weight="600" fill="#D97706" text-anchor="middle">No</text>
+    <rect x="1280" y="325" width="256" height="112" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="1280" y="320" width="256" height="112" rx="16" fill="#0B1220"/>
+    <rect x="1394" y="335" width="28" height="3" rx="1.5" fill="#0D9488"/>
+    <text x="1408" y="366" font-size="20" font-weight="600" fill="#FFFFFF" text-anchor="middle">Ranked response</text>
+    <text x="1408" y="401" font-size="17" font-weight="400" fill="#FFFFFF" text-anchor="middle">Provenance + explanation</text>
+    <rect x="1280" y="525" width="256" height="112" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="1280" y="520" width="256" height="112" rx="16" fill="#FFFFFF" stroke="#D97706" stroke-width="1.5"/>
+    <rect x="1394" y="535" width="28" height="3" rx="1.5" fill="#D97706"/>
+    <text x="1408" y="558" font-size="17" font-weight="500" fill="#0B1220" text-anchor="middle">Human review required</text>
+    <text x="1408" y="588" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">Evidence gap or uncertainty</text>
+    <text x="1408" y="615" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">Rights remain unapproved</text>
+    <rect x="64" y="693" width="1472" height="148" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="64" y="688" width="1472" height="148" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="786" y="703" width="28" height="3" rx="1.5" fill="#0B1220"/>
+    <text x="88" y="731" font-size="20" font-weight="600" fill="#0B1220">Relevance, evidence, and rights are separate signals.</text>
+    <path d="M536 754 L536 812" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
+    <path d="M1024 754 L1024 812" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="88" y="771" font-size="17" font-weight="600" fill="#0D9488">Retrieval relevance</text>
+    <text x="88" y="805" font-size="17" font-weight="400" fill="#334155">How well the query matches.</text>
+    <text x="576" y="771" font-size="17" font-weight="600" fill="#7C3AED">Evidence confidence</text>
+    <text x="576" y="805" font-size="17" font-weight="400" fill="#334155">How much support is available.</text>
+    <text x="1064" y="771" font-size="17" font-weight="600" fill="#0B1220">Rights status</text>
+    <text x="1064" y="805" font-size="17" font-weight="400" fill="#334155">Reported for review; never approval.</text>
+    <text x="64" y="878" font-size="17" font-weight="400" fill="#475569">Public runtime: deterministic metadata + BM25 retrieval; no visual inference or rights approval.</text>
+  </g>
 </svg>
