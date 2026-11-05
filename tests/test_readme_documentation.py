@@ -147,6 +147,7 @@ def test_readme_has_approved_portfolio_template_structure() -> None:
     assert all(section in heading_ids for section in required_headings)
 
     def anchor_links(text: str) -> list[tuple[str, str]]:
+        """Return Markdown and HTML fragment links as normalized label-target pairs."""
         markdown_links = re.findall(r"\[([^\]]+)\]\(#([^)]+)\)", text, re.I)
         html_links = re.findall(r"<a\b[^>]*href=[\"']#([^\"']+)[\"'][^>]*>(.*?)</a>", text, re.I | re.S)
         return [(label.strip().lower(), target) for label, target in markdown_links] + [
