@@ -23,7 +23,7 @@
     <rect x="1206" y="43" width="330" height="42" rx="12" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
     <text x="1371" y="70" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">Mock-first reference application</text>
     <path d="M64 186 L1536 186" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
-    <text x="64" y="239" font-size="17" font-weight="600" fill="#0D9488">RETRIEVAL RELEVANCE</text>
+    <text x="64" y="239" font-size="17" font-weight="600" fill="#0F766E">RETRIEVAL RELEVANCE</text>
     <text x="64" y="272" font-size="20" font-weight="400" fill="#334155">Parallel signals, fused into one rank.</text>
     <path d="M64 291 L848 291" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
     <text x="872" y="239" font-size="17" font-weight="600" fill="#7C3AED">EVIDENCE CONFIDENCE + REVIEW</text>
@@ -74,7 +74,7 @@
     <path d="M1112 448 L1184 376 L1256 448 L1184 520 Z" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2"/>
     <text x="1184" y="459" font-size="30" font-weight="600" fill="#7C3AED" text-anchor="middle">?</text>
     <text x="1238" y="361" font-size="17" font-weight="600" fill="#2563EB" text-anchor="middle">Yes</text>
-    <text x="1220" y="565" font-size="17" font-weight="600" fill="#D97706" text-anchor="middle">No</text>
+    <text x="1220" y="565" font-size="17" font-weight="600" fill="#B45309" text-anchor="middle">No</text>
     <rect x="1280" y="325" width="256" height="112" rx="16" fill="#E2E8F0" opacity="0.55"/>
     <rect x="1280" y="320" width="256" height="112" rx="16" fill="#0B1220"/>
     <rect x="1394" y="335" width="28" height="3" rx="1.5" fill="#0D9488"/>
@@ -92,7 +92,7 @@
     <text x="88" y="731" font-size="20" font-weight="600" fill="#0B1220">Relevance, evidence, and rights are separate signals.</text>
     <path d="M536 754 L536 812" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
     <path d="M1024 754 L1024 812" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
-    <text x="88" y="771" font-size="17" font-weight="600" fill="#0D9488">Retrieval relevance</text>
+    <text x="88" y="771" font-size="17" font-weight="600" fill="#0F766E">Retrieval relevance</text>
     <text x="88" y="805" font-size="17" font-weight="400" fill="#334155">How well the query matches.</text>
     <text x="576" y="771" font-size="17" font-weight="600" fill="#7C3AED">Evidence confidence</text>
     <text x="576" y="805" font-size="17" font-weight="400" fill="#334155">How much support is available.</text>
