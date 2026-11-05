@@ -1,27 +1,83 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="680" viewBox="0 0 1400 680" role="img" aria-labelledby="title desc">
-  <title id="title">Media Content Intelligence end-to-end workflow</title>
-  <desc id="desc">Five connected stages show data sources, ingestion and indexing, search and orchestration, evidence and governance, and delivery and observability.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="architecture-title architecture-desc">
+  <title id="architecture-title">Media Intelligence Architecture</title>
+  <desc id="architecture-desc">Four aligned layers connect the Streamlit and FastAPI experience, query orchestration, deterministic metadata and BM25 retrieval with Reciprocal Rank Fusion, and evidence governance with a human-review signal. Dashed lines connect each layer to a shared observability rail for trace IDs, structured logs, metrics, and feedback. A solid arrow carries evidence and provenance to ranked, explainable media results. The diagram describes a mock-first reference application.</desc>
   <defs>
-    <filter id="rough" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence baseFrequency="0.012" numOctaves="2" seed="8" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="1.1"/></filter>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#64748b"/></marker>
-    <style>
-      .heading{font:700 27px Inter,system-ui,sans-serif;fill:#0f172a}.sub{font:600 20px Inter,system-ui,sans-serif}.body{font:17px Inter,system-ui,sans-serif;fill:#334155}.small{font:15px Inter,system-ui,sans-serif;fill:#475569}.flow{stroke:#64748b;stroke-width:3;fill:none;marker-end:url(#arrow)}.card{stroke-width:2.5;filter:url(#rough)}
-    </style>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1 1 L7 4 L1 7" fill="none" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
   </defs>
-  <rect width="1400" height="680" fill="#fcfcfd"/>
-  <text x="700" y="55" class="heading" text-anchor="middle">From governed media to explainable search results</text>
-  <text x="700" y="87" class="small" text-anchor="middle">Current: deterministic local catalog search · Next: production multimodal indexing and inference</text>
-
-  <path d="M260 325 C278 318 292 330 310 325" class="flow"/><path d="M530 325 C548 318 562 330 580 325" class="flow"/>
-  <path d="M820 325 C838 318 852 330 870 325" class="flow"/><path d="M1090 325 C1108 318 1122 330 1140 325" class="flow"/>
-
-  <g><rect x="40" y="190" width="220" height="270" rx="22" fill="#e7f5ff" stroke="#1e3a5f" class="card"/><circle cx="150" cy="172" r="23" fill="#1e3a5f"/><text x="150" y="180" font-size="22" text-anchor="middle" fill="white">1</text><text x="150" y="235" class="sub" text-anchor="middle" fill="#1e3a5f">Data Sources</text><text x="150" y="294" class="body" text-anchor="middle"><tspan x="150" dy="0">Ad archives</tspan><tspan x="150" dy="31">Short social video</tspan><tspan x="150" dy="31">Influencer content</tspan><tspan x="150" dy="31">Metadata + rights</tspan></text></g>
-  <g><rect x="310" y="190" width="220" height="270" rx="22" fill="#f3f0ff" stroke="#5f3dc4" class="card"/><circle cx="420" cy="172" r="23" fill="#5f3dc4"/><text x="420" y="180" font-size="22" text-anchor="middle" fill="white">2</text><text x="420" y="230" class="sub" text-anchor="middle" fill="#5f3dc4"><tspan x="420">Ingestion &amp;</tspan><tspan x="420" dy="27">Indexing</tspan></text><text x="420" y="314" class="body" text-anchor="middle"><tspan x="420">Validate + register</tspan><tspan x="420" dy="31">Extract metadata</tspan><tspan x="420" dy="31">Build local catalog</tspan><tspan x="420" dy="31">Future ML indexes</tspan></text></g>
-  <g><rect x="580" y="155" width="240" height="340" rx="25" fill="#e3fafc" stroke="#0b7285" stroke-width="4" class="card"/><circle cx="700" cy="137" r="25" fill="#0b7285"/><text x="700" y="146" font-size="23" text-anchor="middle" fill="white">3</text><text x="700" y="205" class="sub" text-anchor="middle" fill="#0b7285"><tspan x="700">Search &amp;</tspan><tspan x="700" dy="28">Orchestration</tspan></text><text x="700" y="300" class="body" text-anchor="middle"><tspan x="700">Parse intent</tspan><tspan x="700" dy="31">Rewrite query + HyDE</tspan><tspan x="700" dy="31">BM25 + metadata search</tspan><tspan x="700" dy="31">RRF fusion</tspan><tspan x="700" dy="31">Candidate evidence</tspan></text></g>
-  <g><rect x="870" y="190" width="220" height="270" rx="22" fill="#fff0f6" stroke="#c2255c" class="card"/><circle cx="980" cy="172" r="23" fill="#c2255c"/><text x="980" y="180" font-size="22" text-anchor="middle" fill="white">4</text><text x="980" y="230" class="sub" text-anchor="middle" fill="#c2255c"><tspan x="980">Evidence &amp;</tspan><tspan x="980" dy="27">Governance</tspan></text><text x="980" y="314" class="body" text-anchor="middle"><tspan x="980">Validate evidence</tspan><tspan x="980" dy="31">Rights + brand safety</tspan><tspan x="980" dy="31">Security guardrails</tspan><tspan x="980" dy="31">Human review</tspan></text></g>
-  <g><rect x="1140" y="190" width="220" height="270" rx="22" fill="#ebfbee" stroke="#2b8a3e" class="card"/><circle cx="1250" cy="172" r="23" fill="#2b8a3e"/><text x="1250" y="180" font-size="22" text-anchor="middle" fill="white">5</text><text x="1250" y="230" class="sub" text-anchor="middle" fill="#2b8a3e"><tspan x="1250">Delivery &amp;</tspan><tspan x="1250" dy="27">Observability</tspan></text><text x="1250" y="314" class="body" text-anchor="middle"><tspan x="1250">API + Streamlit</tspan><tspan x="1250" dy="31">Exact source asset</tspan><tspan x="1250" dy="31">Trace + metrics</tspan><tspan x="1250" dy="31">Feedback loop</tspan></text></g>
-
-  <rect x="250" y="555" width="900" height="70" rx="18" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 7"/>
-  <text x="700" y="585" class="body" text-anchor="middle">Raw and restricted media stays local. Git contains code, schemas, diagrams, and reproducible download logic only.</text>
-  <text x="700" y="612" class="small" text-anchor="middle">Every returned asset retains source provenance; missing rights evidence triggers review rather than approval.</text>
+  <g font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="0" y="0" width="1600" height="900" fill="#F8FAFC"/>
+    <text x="64" y="57" font-size="17" font-weight="600" fill="#475569">MEDIA CONTENT INTELLIGENCE</text>
+    <text x="64" y="115" font-size="44" font-weight="700" fill="#0B1220">Media Intelligence Architecture</text>
+    <text x="64" y="151" font-size="21" font-weight="400" fill="#475569">From natural-language intent to ranked results with evidence and provenance.</text>
+    <rect x="1206" y="43" width="330" height="42" rx="12" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="1371" y="70" font-size="17" font-weight="400" fill="#475569" text-anchor="middle">Mock-first reference application</text>
+    <path d="M64 186 L1536 186" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="64" y="249" width="344" height="320" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="64" y="244" width="344" height="320" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="88" y="268" width="36" height="36" rx="10" fill="#0B1220"/>
+    <rect x="96" y="278" width="20" height="15" fill="transparent" stroke="#FFFFFF" stroke-width="1.5"/>
+    <path d="M96 282 L116 282" fill="none" stroke="#FFFFFF" stroke-width="1.5"/>
+    <text x="88" y="348" font-size="24" font-weight="700" fill="#0B1220">Experience</text>
+    <path d="M88 371 L384 371" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="88" y="410" font-size="20" font-weight="400" fill="#334155">Interactive search</text>
+    <text x="88" y="445" font-size="20" font-weight="400" fill="#334155">Streamlit workspace</text>
+    <text x="88" y="480" font-size="20" font-weight="400" fill="#334155">FastAPI / OpenAPI</text>
+    <text x="88" y="537" font-size="17" font-weight="400" fill="#475569">Query + inspect results</text>
+    <path d="M412 404 L436 404" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M236 564 L236 620" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="5 6"/>
+    <rect x="440" y="249" width="344" height="320" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="440" y="244" width="344" height="320" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="464" y="268" width="36" height="36" rx="10" fill="#2563EB"/>
+    <path d="M474 280 L488 280 L488 292 L474 292 L474 280" fill="none" stroke="#FFFFFF" stroke-width="1.5"/>
+    <path d="M481 276 L481 296" fill="none" stroke="#FFFFFF" stroke-width="1.5"/>
+    <text x="464" y="348" font-size="24" font-weight="700" fill="#0B1220">Orchestration</text>
+    <path d="M464 371 L760 371" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="464" y="410" font-size="20" font-weight="400" fill="#334155">Query interpretation</text>
+    <text x="464" y="445" font-size="20" font-weight="400" fill="#334155">Media Orchestrator</text>
+    <text x="464" y="480" font-size="20" font-weight="400" fill="#334155">Typed A2A task</text>
+    <text x="464" y="537" font-size="17" font-weight="400" fill="#475569">Coordinate typed requests</text>
+    <path d="M788 404 L812 404" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M612 564 L612 620" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="5 6"/>
+    <rect x="816" y="249" width="344" height="320" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="816" y="244" width="344" height="320" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="840" y="268" width="36" height="36" rx="10" fill="#0D9488"/>
+    <path d="M848 277 L867 277" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+    <path d="M848 285 L863 285" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+    <path d="M848 293 L859 293" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+    <text x="840" y="348" font-size="24" font-weight="700" fill="#0B1220">Retrieval Intelligence</text>
+    <path d="M840 371 L1136 371" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="840" y="410" font-size="20" font-weight="400" fill="#334155">Metadata search</text>
+    <text x="840" y="445" font-size="20" font-weight="400" fill="#334155">BM25 search</text>
+    <text x="840" y="480" font-size="20" font-weight="400" fill="#334155">Reciprocal Rank Fusion</text>
+    <text x="840" y="537" font-size="17" font-weight="400" fill="#475569">Deterministic ranking</text>
+    <path d="M1164 404 L1188 404" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow)"/>
+    <path d="M988 564 L988 620" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="5 6"/>
+    <rect x="1192" y="249" width="344" height="320" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="1192" y="244" width="344" height="320" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <rect x="1216" y="268" width="36" height="36" rx="10" fill="#7C3AED"/>
+    <path d="M1234 275 L1243 279 L1242 290 L1234 297 L1226 290 L1225 279 L1234 275" fill="none" stroke="#FFFFFF" stroke-width="1.5"/>
+    <path d="M1229 285 L1233 289 L1239 282" fill="none" stroke="#FFFFFF" stroke-width="1.5"/>
+    <text x="1216" y="348" font-size="24" font-weight="700" fill="#0B1220">Evidence Governance</text>
+    <path d="M1216 371 L1512 371" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="1216" y="410" font-size="20" font-weight="400" fill="#334155">Evidence Validator</text>
+    <text x="1216" y="445" font-size="20" font-weight="400" fill="#334155">Guardrails</text>
+    <text x="1216" y="480" font-size="20" font-weight="400" fill="#334155">Human-review signal</text>
+    <text x="1216" y="537" font-size="17" font-weight="400" fill="#475569">Surface review requirements</text>
+    <path d="M1364 564 L1364 620" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="5 6"/>
+    <rect x="64" y="625" width="1472" height="88" rx="16" fill="#E2E8F0" opacity="0.55"/>
+    <rect x="64" y="620" width="1472" height="88" rx="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="88" y="672" font-size="24" font-weight="700" fill="#0B1220">Observability</text>
+    <path d="M305 643 L305 685" fill="none" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="340" y="670" font-size="20" font-weight="400" fill="#334155">Trace IDs</text>
+    <text x="595" y="670" font-size="20" font-weight="400" fill="#334155">Structured logs</text>
+    <text x="912" y="670" font-size="20" font-weight="400" fill="#334155">Metrics</text>
+    <text x="1205" y="670" font-size="20" font-weight="400" fill="#334155">Feedback</text>
+    <path d="M1536 404 L1560 404 L1560 744 L800 744 L800 768" fill="none" stroke="#2563EB" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="1160" y="734" font-size="17" font-weight="400" fill="#475569">Evidence + provenance</text>
+    <rect x="344" y="773" width="912" height="84" rx="16" fill="#E2E8F0" opacity="0.75"/>
+    <rect x="344" y="768" width="912" height="84" rx="16" fill="#0B1220"/>
+    <text x="800" y="820" font-size="28" font-weight="600" fill="#FFFFFF" text-anchor="middle">Ranked, explainable media results</text>
+  </g>
 </svg>
