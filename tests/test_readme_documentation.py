@@ -56,11 +56,6 @@ def test_excalidraw_source_is_editable(name: str, required_labels: set[str]) -> 
         if element.get("type") == "text"
     }
     assert required_labels <= labels
-    assert all(
-        element.get("roughness") == 0
-        for element in document["elements"]
-        if element.get("type") != "text" and "roughness" in element
-    )
 
 
 @pytest.mark.parametrize(("name", "required_labels"), DIAGRAMS.items())
@@ -96,6 +91,9 @@ def test_readme_excludes_internal_repository_strategy_disclosure() -> None:
     paths.extend(DIAGRAM_DIR / f"{name}.excalidraw" for name in DIAGRAMS)
     public_text = " ".join(path.read_text(encoding="utf-8") for path in paths)
     forbidden_concepts = (
+        r"\braw\s+and\s+restricted\s+media\b",
+        r"\bstays\s+local\b",
+        r"\buncommitted\b",
         r"\b(?:git[ -]?ignore|gitignore)\b",
         r"\b(?:git[ -]?ignore(?:d)?|ignored|uncommitted)\s+(?:files?|code|implementation)\b",
         r"\bprivate\s+(?:code|implementation)\b",
@@ -118,6 +116,43 @@ def test_excalidraw_drawables_use_zero_roughness(name: str) -> None:
         for element in document["elements"]
         if element.get("type") != "text" and "roughness" in element
     )
+
+
+@pytest.mark.parametrize(
+    "artifact_path",
+    [README_PATH]
+    + [DIAGRAM_DIR / "rendered" / f"{name}.svg" for name in DIAGRAMS]
+    + [DIAGRAM_DIR / f"{name}.excalidraw" for name in DIAGRAMS],
+    ids=lambda path: path.name,
+)
+@pytest.mark.parametrize(
+    "disclosure",
+    [
+        "raw and restricted media",
+        "RAW AND RESTRICTED MEDIA",
+        "raw\n and\t restricted\nmedia",
+        "stays local",
+        "STAYS LOCAL",
+        "stays\n\t local",
+        "uncommitted",
+        "UNCOMMITTED",
+        "\n\tuncommitted\n",
+    ],
+)
+def test_disclosure_guard_rejects_spec_phrases_in_every_public_artifact(
+    artifact_path: Path, disclosure: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The assembled public text rejects every prohibited spec disclosure."""
+    original_read_text = Path.read_text
+
+    def read_text_with_disclosure(path: Path, *args, **kwargs) -> str:
+        """Inject a disclosure into one public artifact without changing files."""
+        text = original_read_text(path, *args, **kwargs)
+        return f"{text}\n{disclosure}\n" if path == artifact_path else text
+
+    monkeypatch.setattr(Path, "read_text", read_text_with_disclosure)
+    with pytest.raises(AssertionError):
+        test_readme_excludes_internal_repository_strategy_disclosure()
 
 
 def test_readme_has_approved_portfolio_template_structure() -> None:
